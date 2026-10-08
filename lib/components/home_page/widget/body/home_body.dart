@@ -47,8 +47,7 @@ class _HomeBodyState extends State<HomeBody> {
     );
     return BlocListener<HomeBloc, HomeState>(
       listenWhen: (previous, current) =>
-          previous.url != current.url &&
-          current.url != _controller.text,
+          previous.url != current.url && current.url != _controller.text,
       listener: (context, state) {
         _controller.value = TextEditingValue(
           text: state.url,
@@ -132,4 +131,3 @@ class _HomeBodyState extends State<HomeBody> {
     );
   }
 }
-

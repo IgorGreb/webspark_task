@@ -19,7 +19,9 @@ class ProcessView extends StatelessWidget {
       listenWhen: (previous, current) =>
           !previous.isSubmitted && current.isSubmitted,
       listener: (context, state) {
-        if (context.mounted) context.goNamed(KRoute.results.name);
+        if (context.mounted) {
+          context.goNamed(KRoute.results.name, extra: state.results);
+        }
       },
       child: Scaffold(
         appBar: CustomAppBar(title: l10n.processScreenTitle),

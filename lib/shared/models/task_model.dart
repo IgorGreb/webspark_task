@@ -16,4 +16,3 @@ sealed class TaskModel with _$TaskModel {
   factory TaskModel.fromJson(Map<String, dynamic> json) =>
       _$TaskModelFromJson(json);
 }
-

@@ -15,4 +15,3 @@ class HomeBlocProvider extends StatelessWidget {
     );
   }
 }
-

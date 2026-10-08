@@ -3,15 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:webspark_task/components/result_list/widget/result_row.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
+import 'package:webspark_task/shared/models/solved_model.dart';
 
 class ResultListBody extends StatelessWidget {
-  const ResultListBody({super.key, required this.mockPaths});
+  const ResultListBody({super.key, required this.results});
 
-  final List<String> mockPaths;
+  final List<SolvedModel> results;
 
   @override
   Widget build(BuildContext context) {
-    if (mockPaths.isEmpty) {
+    if (results.isEmpty) {
       return Center(
         child: Text(
           context.l10n.emptyResultsMessage,
@@ -21,9 +22,11 @@ class ResultListBody extends StatelessWidget {
       );
     }
     return ListView.builder(
-      itemCount: mockPaths.length,
+      itemCount: results.length,
       itemBuilder: (context, index) {
-        return ResultRow(pathStr: mockPaths[index]);
+        final result = results[index];
+        final pathStr = result.steps.map((p) => '(${p.x},${p.y})').join('->');
+        return ResultRow(pathStr: pathStr);
       },
     );
   }

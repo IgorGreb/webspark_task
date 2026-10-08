@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:webspark_task/shared/models/solved_model.dart';
 import 'package:webspark_task/components/result_list/view/result_list_view.dart';
 import 'package:webspark_task/components/home_page/widget/bloc_provider/home_bloc_provider.dart';
 import 'package:webspark_task/components/not_found/view/not_found_view.dart';
@@ -35,8 +36,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: KRoute.results.name,
       path: KRoute.results.path,
-      pageBuilder: (context, state) =>
-          const NoTransitionPage(child: ResultListView()),
+      pageBuilder: (context, state) {
+        final results = state.extra as List<SolvedModel>? ?? const [];
+        return NoTransitionPage(child: ResultListView(results: results));
+      },
     ),
   ],
 );
