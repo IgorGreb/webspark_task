@@ -165,6 +165,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sending results...'**
   String get sendingResults;
+
+  /// Title of the Result list screen app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Result list screen'**
+  String get resultScreenTitle;
+
+  /// Message shown when there are no results to display
+  ///
+  /// In en, this message translates to:
+  /// **'No results available.'**
+  String get emptyResultsMessage;
 }
 
 class _AppLocalizationsDelegate
