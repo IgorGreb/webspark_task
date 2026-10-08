@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -50,7 +51,7 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
     final results = <SolvedModel>[];
     var solved = 0;
     for (final task in tasks) {
-      final solvedTask = _solveSafely(task);
+      final solvedTask = await compute(_solveTaskIsolate, task);
       if (solvedTask != null) results.add(solvedTask);
       solved += 1;
       emit(
@@ -104,16 +105,14 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
     );
   }
 
-  /// Runs the solver for a single task, treating an invalid field size
-  /// as a skipped task rather than crashing the whole calculation.
-  SolvedModel? _solveSafely(TaskModel task) {
-    try {
-      return solveTask(task);
-    } on ArgumentError {
-      return null;
-    }
-  }
-
   SomeFailure _failureOf(Either<SomeFailure, dynamic> result) =>
       result.fold((failure) => failure, (_) => SomeFailure.unknown);
+}
+
+SolvedModel? _solveTaskIsolate(TaskModel task) {
+  try {
+    return solveTask(task);
+  } on ArgumentError {
+    return null;
+  }
 }
