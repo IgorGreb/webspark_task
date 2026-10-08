@@ -1,0 +1,31 @@
+{
+  "@@locale": "en",
+  "homeScreenTitle": "Home screen",
+  "@homeScreenTitle": {
+    "description": "Title of the Home screen app bar"
+  },
+  "startCountingProcess": "Start counting process",
+  "@startCountingProcess": {
+    "description": "Label of the button starting the counting process on Home screen"
+  },
+  "notFoundTitle": "Page not found",
+  "@notFoundTitle": {
+    "description": "Title of the not found screen app bar"
+  },
+  "notFoundMessage": "The page you requested does not exist.",
+  "@notFoundMessage": {
+    "description": "Message shown on the not found screen"
+  },
+  "notFoundGoHome": "Go home",
+  "@notFoundGoHome": {
+    "description": "Label of the button returning to home from not found screen"
+  },
+  "setValidBaseUrl": "Set valid API base URL in order to continue",
+  "@setValidBaseUrl": {
+    "description": "Hint text on Home screen asking for valid API base URL"
+  },
+  "baseUrlHint": "https://example.com",
+  "@baseUrlHint": {
+    "description": "Placeholder for API base URL input on Home screen"
+  }
+}
