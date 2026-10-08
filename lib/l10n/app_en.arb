@@ -35,5 +35,17 @@
   "calculationsInProgress": "Calculating shortest paths...",
   "@calculationsInProgress": {
     "description": "Message shown while calculations are in progress on Process screen"
+  },
+  "calculationsFinished": "All calculations has finished, you can send your results to server",
+  "@calculationsFinished": {
+    "description": "Message shown when all calculations are finished on Process screen"
+  },
+  "sendResultsToServer": "Send results to server",
+  "@sendResultsToServer": {
+    "description": "Label of the button sending results to server on Process screen"
+  },
+  "sendingResults": "Sending results...",
+  "@sendingResults": {
+    "description": "Message shown while results are being sent on Process screen"
   }
 }

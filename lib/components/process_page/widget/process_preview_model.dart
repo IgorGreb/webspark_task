@@ -2,14 +2,24 @@ import 'package:flutter/material.dart';
 
 /// UI-only preview state for the Process screen (mocks, no bloc).
 ///
-/// The screen shows processing only: no finished text, no results,
-/// no send button. Real states arrive with `process-logic`.
+/// The screen shows processing progress and the send action only:
+/// no result paths are displayed here. Real states arrive with
+/// `process-logic`.
 enum ProcessPreviewState {
   /// Fetching tasks: progress text + loader, list not yet visible.
   fetching,
 
   /// Calculating: progress text, percent, loader, list of mocks.
   calculating,
+
+  /// Calculations finished: 100%, list complete, send button visible.
+  ready,
+
+  /// Sending results: button blocked with loader.
+  submitting,
+
+  /// Send failed: error message visible, button enabled again.
+  submitError,
 }
 
 /// Mock item of the tasks list: title + percent.
