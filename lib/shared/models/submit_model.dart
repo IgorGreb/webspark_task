@@ -50,3 +50,15 @@ sealed class SubmitRequestModel with _$SubmitRequestModel {
   factory SubmitRequestModel.fromJson(Map<String, dynamic> json) =>
       _$SubmitRequestModelFromJson(json);
 }
+
+/// POST response item: `{"id": ..., "correct": bool}`.
+@freezed
+sealed class SubmitResponseModel with _$SubmitResponseModel {
+  const factory SubmitResponseModel({
+    required String id,
+    required bool correct,
+  }) = _SubmitResponseModel;
+
+  factory SubmitResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$SubmitResponseModelFromJson(json);
+}
