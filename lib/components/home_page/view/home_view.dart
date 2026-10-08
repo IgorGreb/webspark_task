@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webspark_task/components/home_page/widget/body/home_body.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
+import 'package:webspark_task/shared/constants/theme/app_colors.dart';
 import 'package:webspark_task/shared/widget/custom_app_bar.dart';
 import 'package:webspark_task/shared/widget/start_contining_btn.dart';
 
@@ -18,6 +19,8 @@ class HomeView extends StatelessWidget {
         child: MainBtn(
           onPressed: () {},
           label: context.l10n.startCountingProcess,
+          textColor: AppColors.buttonTextColor,
+          disabledTextColor: AppColors.buttonTextColor,
         ),
       ),
     );

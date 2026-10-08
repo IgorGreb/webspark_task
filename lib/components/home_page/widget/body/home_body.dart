@@ -14,6 +14,8 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> {
   final _focusNode = FocusNode();
 
+  static const String? _errorMessage = null;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +36,11 @@ class _HomeBodyState extends State<HomeBody> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final underline = _underline(AppColors.lockedCell);
+    final errorMessage = _errorMessage;
+    final errorTextStyle = TextStyle(
+      fontSize: 12.sp,
+      color: Theme.of(context).colorScheme.error,
+    );
     return SingleChildScrollView(
       padding: AppInsets.homeBody,
       child: Column(
@@ -54,8 +61,10 @@ class _HomeBodyState extends State<HomeBody> {
               ),
               SizedBox(width: AppSizes.inputIconGap.w),
               Expanded(
-                child: SizedBox(
-                  height: AppSizes.inputHeight.h,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: AppSizes.inputHeight.h,
+                  ),
                   child: TextField(
                     focusNode: _focusNode,
                     keyboardType: TextInputType.url,
@@ -75,6 +84,18 @@ class _HomeBodyState extends State<HomeBody> {
                 ),
               ),
             ],
+          ),
+          SizedBox(height: 8.h),
+          SizedBox(
+            height: 20.h,
+            child: errorMessage == null
+                ? const SizedBox.shrink()
+                : Text(
+                    errorMessage,
+                    style: errorTextStyle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
           ),
         ],
       ),
