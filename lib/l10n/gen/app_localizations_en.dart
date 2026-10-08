@@ -28,4 +28,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get baseUrlHint => 'https://example.com';
+
+  @override
+  String get processScreenTitle => 'Process screen';
+
+  @override
+  String get calculationsFinished =>
+      'All calculations has finished, you can send your results to server';
+
+  @override
+  String get calculationsInProgress => 'Calculating shortest paths...';
+
+  @override
+  String get sendResultsToServer => 'Send results to server';
 }

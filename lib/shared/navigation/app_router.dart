@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webspark_task/components/home_page/widget/bloc_provider/home_bloc_provider.dart';
 import 'package:webspark_task/components/not_found/view/not_found_view.dart';
+import 'package:webspark_task/components/process_page/widget/bloc_provider/process_bloc_provider.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -27,7 +28,7 @@ final GoRouter router = GoRouter(
       name: KRoute.process.name,
       path: KRoute.process.path,
       pageBuilder: (context, state) => const NoTransitionPage(
-        child: Scaffold(body: Center(child: Text('Process'))),
+        child: ProcessBlocProvider(),
       ),
     ),
   ],
