@@ -82,42 +82,6 @@ class ProcessBody extends StatelessWidget {
                     )
                   : const AppLoader(),
             ),
-          if (!_isFetching) ...[
-            SizedBox(height: 12.h),
-            const Divider(height: 1),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: kProcessTasksMock.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final task = kProcessTasksMock[index];
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          task.title,
-                          style: TextStyle(
-                            fontSize: AppSizes.inputFontSize.sp,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Text(
-                        '${task.percent}%',
-                        style: TextStyle(fontSize: AppSizes.inputFontSize.sp),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            const Divider(height: 1),
-          ],
           if (_showError) ...[
             SizedBox(height: 12.h),
             const ErrorBanner(failure: SomeFailure.serverError),
