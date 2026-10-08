@@ -33,3 +33,13 @@ _SubmitRequestModel _$SubmitRequestModelFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SubmitRequestModelToJson(_SubmitRequestModel instance) =>
     <String, dynamic>{'id': instance.id, 'result': instance.result};
+
+_SubmitResponseModel _$SubmitResponseModelFromJson(Map<String, dynamic> json) =>
+    _SubmitResponseModel(
+      id: json['id'] as String,
+      correct: json['correct'] as bool,
+    );
+
+Map<String, dynamic> _$SubmitResponseModelToJson(
+  _SubmitResponseModel instance,
+) => <String, dynamic>{'id': instance.id, 'correct': instance.correct};

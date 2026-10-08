@@ -815,4 +815,264 @@ $SubmitResultModelCopyWith<$Res> get result {
 }
 }
 
+
+/// @nodoc
+mixin _$SubmitResponseModel {
+
+ String get id; bool get correct;
+/// Create a copy of SubmitResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SubmitResponseModelCopyWith<SubmitResponseModel> get copyWith => _$SubmitResponseModelCopyWithImpl<SubmitResponseModel>(this as SubmitResponseModel, _$identity);
+
+  /// Serializes this SubmitResponseModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubmitResponseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.correct, correct) || other.correct == correct));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,correct);
+
+@override
+String toString() {
+  return 'SubmitResponseModel(id: $id, correct: $correct)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SubmitResponseModelCopyWith<$Res>  {
+  factory $SubmitResponseModelCopyWith(SubmitResponseModel value, $Res Function(SubmitResponseModel) _then) = _$SubmitResponseModelCopyWithImpl;
+@useResult
+$Res call({
+ String id, bool correct
+});
+
+
+
+
+}
+/// @nodoc
+class _$SubmitResponseModelCopyWithImpl<$Res>
+    implements $SubmitResponseModelCopyWith<$Res> {
+  _$SubmitResponseModelCopyWithImpl(this._self, this._then);
+
+  final SubmitResponseModel _self;
+  final $Res Function(SubmitResponseModel) _then;
+
+/// Create a copy of SubmitResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? correct = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,correct: null == correct ? _self.correct : correct // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [SubmitResponseModel].
+extension SubmitResponseModelPatterns on SubmitResponseModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SubmitResponseModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SubmitResponseModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SubmitResponseModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _SubmitResponseModel():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SubmitResponseModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SubmitResponseModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  bool correct)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SubmitResponseModel() when $default != null:
+return $default(_that.id,_that.correct);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  bool correct)  $default,) {final _that = this;
+switch (_that) {
+case _SubmitResponseModel():
+return $default(_that.id,_that.correct);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  bool correct)?  $default,) {final _that = this;
+switch (_that) {
+case _SubmitResponseModel() when $default != null:
+return $default(_that.id,_that.correct);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _SubmitResponseModel implements SubmitResponseModel {
+  const _SubmitResponseModel({required this.id, required this.correct});
+  factory _SubmitResponseModel.fromJson(Map<String, dynamic> json) => _$SubmitResponseModelFromJson(json);
+
+@override final  String id;
+@override final  bool correct;
+
+/// Create a copy of SubmitResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SubmitResponseModelCopyWith<_SubmitResponseModel> get copyWith => __$SubmitResponseModelCopyWithImpl<_SubmitResponseModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$SubmitResponseModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubmitResponseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.correct, correct) || other.correct == correct));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,correct);
+
+@override
+String toString() {
+  return 'SubmitResponseModel(id: $id, correct: $correct)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SubmitResponseModelCopyWith<$Res> implements $SubmitResponseModelCopyWith<$Res> {
+  factory _$SubmitResponseModelCopyWith(_SubmitResponseModel value, $Res Function(_SubmitResponseModel) _then) = __$SubmitResponseModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, bool correct
+});
+
+
+
+
+}
+/// @nodoc
+class __$SubmitResponseModelCopyWithImpl<$Res>
+    implements _$SubmitResponseModelCopyWith<$Res> {
+  __$SubmitResponseModelCopyWithImpl(this._self, this._then);
+
+  final _SubmitResponseModel _self;
+  final $Res Function(_SubmitResponseModel) _then;
+
+/// Create a copy of SubmitResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? correct = null,}) {
+  return _then(_SubmitResponseModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,correct: null == correct ? _self.correct : correct // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
 // dart format on
