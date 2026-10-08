@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:webspark_task/app.dart';
+import 'package:webspark_task/bootstrap.dart';
 
-void main() {
-  runApp(const App());
-}
+void main() => bootstrap();
