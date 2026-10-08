@@ -135,6 +135,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'https://example.com'**
   String get baseUrlHint;
+
+  /// Title of the Process screen app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Process screen'**
+  String get processScreenTitle;
+
+  /// Message shown while calculations are in progress on Process screen
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating shortest paths...'**
+  String get calculationsInProgress;
+
+  /// Message shown when all calculations are finished on Process screen
+  ///
+  /// In en, this message translates to:
+  /// **'All calculations has finished, you can send your results to server'**
+  String get calculationsFinished;
+
+  /// Label of the button sending results to server on Process screen
+  ///
+  /// In en, this message translates to:
+  /// **'Send results to server'**
+  String get sendResultsToServer;
+
+  /// Message shown while results are being sent on Process screen
+  ///
+  /// In en, this message translates to:
+  /// **'Sending results...'**
+  String get sendingResults;
 }
 
 class _AppLocalizationsDelegate
