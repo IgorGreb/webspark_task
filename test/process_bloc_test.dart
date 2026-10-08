@@ -51,7 +51,9 @@ class FakePathRepository implements IPathRepository {
   List<SubmitRequestModel>? lastSubmitted;
 
   @override
-  Future<Either<SomeFailure, List<TaskModel>>> fetchTasks(String baseUrl) async {
+  Future<Either<SomeFailure, List<TaskModel>>> fetchTasks(
+    String baseUrl,
+  ) async {
     final failure = fetchFailure;
     if (failure != null) return Left(failure);
     return Right(tasks);
@@ -131,14 +133,11 @@ void main() {
     expect(path.lastSubmitted, hasLength(1));
     expect(path.lastSubmitted!.first.id, 'a');
     expect(path.lastSubmitted!.first.result.path, '(2,1)->(1,2)->(0,2)');
-    expect(
-      path.lastSubmitted!.first.result.steps,
-      const [
-        SubmitStepModel(x: '2', y: '1'),
-        SubmitStepModel(x: '1', y: '2'),
-        SubmitStepModel(x: '0', y: '2'),
-      ],
-    );
+    expect(path.lastSubmitted!.first.result.steps, const [
+      SubmitStepModel(x: '2', y: '1'),
+      SubmitStepModel(x: '1', y: '2'),
+      SubmitStepModel(x: '0', y: '2'),
+    ]);
     await bloc.close();
   });
 
@@ -184,4 +183,3 @@ void main() {
     await bloc.close();
   });
 }
-

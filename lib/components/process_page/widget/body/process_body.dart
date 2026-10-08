@@ -69,10 +69,7 @@ class ProcessBody extends StatelessWidget {
                           color: Colors.grey.shade400,
                         ),
                       ),
-                      AppLoader(
-                        size: 100,
-                        value: value / 100,
-                      ),
+                      AppLoader(size: 100, value: value / 100),
                     ],
                   );
                 },
@@ -89,5 +86,3 @@ class ProcessBody extends StatelessWidget {
     );
   }
 }
-
-

@@ -24,10 +24,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (savedUrl.isEmpty) {
       return const HomeState();
     }
-    return HomeState(
-      url: savedUrl,
-      isValid: UrlValidator.isValid(savedUrl),
-    );
+    return HomeState(url: savedUrl, isValid: UrlValidator.isValid(savedUrl));
   }
 
   void _onUrlChanged(HomeUrlChanged event, Emitter<HomeState> emit) {
@@ -70,18 +67,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final result = await _urlRepository.saveUrl(url);
 
     result.fold(
-      (failure) => emit(
-        state.copyWith(
-          failure: failure,
-          status: HomeStatus.failure,
-        ),
-      ),
+      (failure) =>
+          emit(state.copyWith(failure: failure, status: HomeStatus.failure)),
       (_) => emit(
-        state.copyWith(
-          url: url,
-          failure: null,
-          status: HomeStatus.success,
-        ),
+        state.copyWith(url: url, failure: null, status: HomeStatus.success),
       ),
     );
   }

@@ -48,8 +48,7 @@ class Grid {
   bool isInside(Point point) =>
       point.x >= 0 && point.x < size && point.y >= 0 && point.y < size;
 
-  bool isFree(Point point) =>
-      isInside(point) && _rows[point.y][point.x] != 'X';
+  bool isFree(Point point) => isInside(point) && _rows[point.y][point.x] != 'X';
 }
 
 /// Generates the cells reachable in one queen move.
