@@ -13,6 +13,8 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
+import 'package:webspark_task/components/home_page/bloc/home_bloc.dart'
+    as _i160;
 import 'package:webspark_task/shared/di/storage_module.dart' as _i830;
 import 'package:webspark_task/shared/repositories/i_url_repository.dart'
     as _i646;
@@ -32,6 +34,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i646.IUrlRepository>(
       () => _i94.UrlRepository(gh<_i460.SharedPreferences>()),
+    );
+    gh.factory<_i160.HomeBloc>(
+      () => _i160.HomeBloc(gh<_i646.IUrlRepository>()),
     );
     return this;
   }
