@@ -14,6 +14,10 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> {
   final _focusNode = FocusNode();
 
+  /// PR-1 pure-UI mock: no bloc, no validation.
+  /// Non-null value here previews the error slot (PR-2 will drive it).
+  static const String? _mockErrorMessage = null;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +38,11 @@ class _HomeBodyState extends State<HomeBody> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final underline = _underline(AppColors.lockedCell);
+    final mockErrorMessage = _mockErrorMessage;
+    final errorTextStyle = TextStyle(
+      fontSize: 12.sp,
+      color: Theme.of(context).colorScheme.error,
+    );
     return SingleChildScrollView(
       padding: AppInsets.homeBody,
       child: Column(
@@ -54,8 +63,10 @@ class _HomeBodyState extends State<HomeBody> {
               ),
               SizedBox(width: AppSizes.inputIconGap.w),
               Expanded(
-                child: SizedBox(
-                  height: AppSizes.inputHeight.h,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: AppSizes.inputHeight.h,
+                  ),
                   child: TextField(
                     focusNode: _focusNode,
                     keyboardType: TextInputType.url,
@@ -75,6 +86,19 @@ class _HomeBodyState extends State<HomeBody> {
                 ),
               ),
             ],
+          ),
+          SizedBox(height: 8.h),
+          // Reserved error slot: keeps layout stable when PR-2 shows a message.
+          SizedBox(
+            height: 20.h,
+            child: mockErrorMessage == null
+                ? const SizedBox.shrink()
+                : Text(
+                    mockErrorMessage,
+                    style: errorTextStyle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
           ),
         ],
       ),
