@@ -44,4 +44,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sendingResults => 'Sending results...';
+
+  @override
+  String get resultScreenTitle => 'Result list screen';
+
+  @override
+  String get emptyResultsMessage => 'No results available.';
 }

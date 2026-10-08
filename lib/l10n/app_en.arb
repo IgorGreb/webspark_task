@@ -47,5 +47,13 @@
   "sendingResults": "Sending results...",
   "@sendingResults": {
     "description": "Message shown while results are being sent on Process screen"
+  },
+  "resultScreenTitle": "Result list screen",
+  "@resultScreenTitle": {
+    "description": "Title of the Result list screen app bar"
+  },
+  "emptyResultsMessage": "No results available.",
+  "@emptyResultsMessage": {
+    "description": "Message shown when there are no results to display"
   }
 }
