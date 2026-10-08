@@ -16,6 +16,8 @@ import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 import 'package:webspark_task/components/home_page/bloc/home_bloc.dart'
     as _i160;
+import 'package:webspark_task/components/process_page/bloc/process_bloc.dart'
+    as _i517;
 import 'package:webspark_task/shared/di/network_module.dart' as _i145;
 import 'package:webspark_task/shared/di/storage_module.dart' as _i830;
 import 'package:webspark_task/shared/repositories/i_path_repository.dart'
@@ -48,6 +50,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i160.HomeBloc>(
       () => _i160.HomeBloc(gh<_i646.IUrlRepository>()),
+    );
+    gh.factory<_i517.ProcessBloc>(
+      () => _i517.ProcessBloc(
+        gh<_i646.IUrlRepository>(),
+        gh<_i374.IPathRepository>(),
+      ),
     );
     return this;
   }

@@ -10,6 +10,7 @@ final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 abstract class KRoute {
   static const home = (name: 'home', path: '/');
   static const process = (name: 'process', path: '/process');
+  static const results = (name: 'results', path: '/results');
 }
 
 final GoRouter router = GoRouter(
@@ -27,8 +28,15 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: KRoute.process.name,
       path: KRoute.process.path,
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: ProcessBlocProvider()),
+    ),
+    GoRoute(
+      name: KRoute.results.name,
+      path: KRoute.results.path,
       pageBuilder: (context, state) => const NoTransitionPage(
-        child: ProcessBlocProvider(),
+        // TODO(results-ui)
+        child: Scaffold(body: Center(child: Text('Results'))),
       ),
     ),
   ],
