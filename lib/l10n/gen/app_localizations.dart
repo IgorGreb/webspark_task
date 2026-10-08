@@ -142,23 +142,11 @@ abstract class AppLocalizations {
   /// **'Process screen'**
   String get processScreenTitle;
 
-  /// Message shown when all calculations are finished on Process screen
-  ///
-  /// In en, this message translates to:
-  /// **'All calculations has finished, you can send your results to server'**
-  String get calculationsFinished;
-
   /// Message shown while calculations are in progress on Process screen
   ///
   /// In en, this message translates to:
   /// **'Calculating shortest paths...'**
   String get calculationsInProgress;
-
-  /// Label of the button sending results to server on Process screen
-  ///
-  /// In en, this message translates to:
-  /// **'Send results to server'**
-  String get sendResultsToServer;
 }
 
 class _AppLocalizationsDelegate

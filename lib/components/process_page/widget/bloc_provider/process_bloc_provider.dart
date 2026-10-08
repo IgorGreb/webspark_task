@@ -5,7 +5,7 @@ import 'package:webspark_task/components/process_page/widget/process_preview_mod
 class ProcessBlocProvider extends StatelessWidget {
   const ProcessBlocProvider({
     super.key,
-    this.previewState = ProcessPreviewState.ready,
+    this.previewState = ProcessPreviewState.calculating,
   });
 
   /// UI-only switch for previewing mock states (no bloc yet).
