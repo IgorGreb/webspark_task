@@ -17,7 +17,6 @@ class HomeView extends StatelessWidget {
       bottomNavigationBar: SafeArea(
         minimum: AppInsets.bottomBarSafeArea,
         child: MainBtn(
-          // PR-1 pure-UI mock: no action, PR-2 will submit the URL.
           onPressed: () {},
           label: context.l10n.startCountingProcess,
           textColor: AppColors.buttonTextColor,
