@@ -1,0 +1,9 @@
+import 'dart:ui';
+
+abstract class AppColors {
+  static const startingCell = Color(0xFF64FFDA);
+  static const terminalCell = Color(0xFF009688);
+  static const lockedCell = Color(0xFF000000);
+  static const pathCell = Color(0xFF4CAF50);
+  static const emptyCell = Color(0xFFFFFFFF);
+}
