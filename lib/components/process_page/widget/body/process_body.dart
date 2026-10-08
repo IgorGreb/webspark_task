@@ -1,94 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:webspark_task/components/process_page/widget/process_preview_model.dart';
+import 'package:webspark_task/components/process_page/bloc/process_bloc.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
-import 'package:webspark_task/shared/models/failure_model/some_failure.dart';
 import 'package:webspark_task/shared/widget/app_loader.dart';
 import 'package:webspark_task/shared/widget/error_banner.dart';
 
 class ProcessBody extends StatelessWidget {
-  const ProcessBody({super.key, required this.previewState});
-
-  final ProcessPreviewState previewState;
-
-  bool get _isFetching => previewState == ProcessPreviewState.fetching;
-
-  bool get _isFinished {
-    switch (previewState) {
-      case ProcessPreviewState.fetching:
-      case ProcessPreviewState.calculating:
-        return false;
-      case ProcessPreviewState.ready:
-      case ProcessPreviewState.submitting:
-      case ProcessPreviewState.submitError:
-        return true;
-    }
-  }
-
-  bool get _isSubmitting => previewState == ProcessPreviewState.submitting;
-
-  bool get _showError => previewState == ProcessPreviewState.submitError;
-
-  String _headerText(BuildContext context) {
-    final l10n = context.l10n;
-    if (_isFinished) return l10n.calculationsFinished;
-    return l10n.calculationsInProgress;
-  }
-
-  String _percentText() {
-    switch (previewState) {
-      case ProcessPreviewState.fetching:
-        return '0%';
-      case ProcessPreviewState.calculating:
-        return '38%';
-      case ProcessPreviewState.ready:
-      case ProcessPreviewState.submitting:
-      case ProcessPreviewState.submitError:
-        return '100%';
-    }
-  }
+  const ProcessBody({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: AppInsets.homeBody,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            _headerText(context),
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: AppSizes.bodyFontSize.sp),
-          ),
-          SizedBox(height: 12.h),
-          if (!_isFetching)
-            Text(
-              _percentText(),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: AppSizes.inputFontSize.sp,
-                fontWeight: FontWeight.w600,
+    final l10n = context.l10n;
+    return BlocBuilder<ProcessBloc, ProcessState>(
+      buildWhen: (previous, current) =>
+          previous.isFetching != current.isFetching ||
+          previous.isCalculating != current.isCalculating ||
+          previous.isSubmitting != current.isSubmitting ||
+          previous.progress != current.progress ||
+          previous.failure != current.failure,
+      builder: (context, state) {
+        final header = state.isReady
+            ? l10n.calculationsFinished
+            : l10n.calculationsInProgress;
+
+        return SingleChildScrollView(
+          padding: AppInsets.homeBody,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                header,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: AppSizes.bodyFontSize.sp),
               ),
-            ),
-          SizedBox(height: 12.h),
-          if (!_isFinished || _isSubmitting)
-            Center(
-              child: _isSubmitting
-                  ? Text(
-                      context.l10n.sendingResults,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: AppSizes.inputFontSize.sp),
-                    )
-                  : const AppLoader(),
-            ),
-          if (_showError) ...[
-            SizedBox(height: 12.h),
-            const ErrorBanner(failure: SomeFailure.serverError),
-          ],
-          SizedBox(height: 12.h),
-        ],
-      ),
+              SizedBox(height: 12.h),
+              TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 300),
+                tween: Tween<double>(begin: 0, end: state.progress.toDouble()),
+                builder: (context, value, child) {
+                  if (state.isSubmitting) {
+                    return Center(
+                      child: Text(
+                        l10n.sendingResults,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: AppSizes.inputFontSize.sp),
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${value.toInt()}%',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: AppSizes.inputFontSize.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        child: Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      AppLoader(
+                        size: 100,
+                        value: value / 100,
+                      ),
+                    ],
+                  );
+                },
+              ),
+              if (state.failure != null) ...[
+                SizedBox(height: 12.h),
+                ErrorBanner(failure: state.failure!),
+              ],
+              SizedBox(height: 12.h),
+            ],
+          ),
+        );
+      },
     );
   }
 }

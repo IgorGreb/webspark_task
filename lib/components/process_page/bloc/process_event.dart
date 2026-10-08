@@ -1,0 +1,8 @@
+part of 'process_bloc.dart';
+
+@freezed
+sealed class ProcessEvent with _$ProcessEvent {
+  const factory ProcessEvent.started() = ProcessStarted;
+
+  const factory ProcessEvent.submitted() = ProcessSubmitted;
+}
