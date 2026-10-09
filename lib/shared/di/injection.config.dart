@@ -52,7 +52,10 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i285.PathRepository(gh<_i519.Client>()),
     );
     gh.factory<_i160.HomeBloc>(
-      () => _i160.HomeBloc(gh<_i646.IUrlRepository>()),
+      () => _i160.HomeBloc(
+        gh<_i646.IUrlRepository>(),
+        gh<_i374.IPathRepository>(),
+      ),
     );
     gh.factory<_i517.ProcessBloc>(
       () => _i517.ProcessBloc(

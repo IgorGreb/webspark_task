@@ -18,7 +18,7 @@ class HomeView extends StatelessWidget {
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         if (state.status == HomeStatus.success) {
-          context.goNamed(KRoute.process.name);
+          context.goNamed(KRoute.process.name, extra: state.tasks);
         }
       },
       child: Scaffold(

@@ -12,11 +12,17 @@ part of 'process_bloc.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$ProcessEvent {
+mixin _$ProcessEvent implements DiagnosticableTreeMixin {
 
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'ProcessEvent'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -28,7 +34,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'ProcessEvent()';
 }
 
@@ -119,10 +125,10 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  submitted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<TaskModel>? tasks)?  started,TResult Function()?  submitted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ProcessStarted() when started != null:
-return started();case ProcessSubmitted() when submitted != null:
+return started(_that.tasks);case ProcessSubmitted() when submitted != null:
 return submitted();case _:
   return orElse();
 
@@ -141,10 +147,10 @@ return submitted();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  submitted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<TaskModel>? tasks)  started,required TResult Function()  submitted,}) {final _that = this;
 switch (_that) {
 case ProcessStarted():
-return started();case ProcessSubmitted():
+return started(_that.tasks);case ProcessSubmitted():
 return submitted();}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -159,10 +165,10 @@ return submitted();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  submitted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<TaskModel>? tasks)?  started,TResult? Function()?  submitted,}) {final _that = this;
 switch (_that) {
 case ProcessStarted() when started != null:
-return started();case ProcessSubmitted() when submitted != null:
+return started(_that.tasks);case ProcessSubmitted() when submitted != null:
 return submitted();case _:
   return null;
 
@@ -174,39 +180,87 @@ return submitted();case _:
 /// @nodoc
 
 
-class ProcessStarted implements ProcessEvent {
-  const ProcessStarted();
+class ProcessStarted with DiagnosticableTreeMixin implements ProcessEvent {
+  const ProcessStarted({final  List<TaskModel>? tasks}): _tasks = tasks;
   
 
+ final  List<TaskModel>? _tasks;
+ List<TaskModel>? get tasks {
+  final value = _tasks;
+  if (value == null) return null;
+  if (_tasks is EqualUnmodifiableListView) return _tasks;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
 
 
+/// Create a copy of ProcessEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ProcessStartedCopyWith<ProcessStarted> get copyWith => _$ProcessStartedCopyWithImpl<ProcessStarted>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'ProcessEvent.started'))
+    ..add(DiagnosticsProperty('tasks', tasks));
+}
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProcessStarted);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProcessStarted&&const DeepCollectionEquality().equals(other._tasks, _tasks));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_tasks));
 
 @override
-String toString() {
-  return 'ProcessEvent.started()';
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+  return 'ProcessEvent.started(tasks: $tasks)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class $ProcessStartedCopyWith<$Res> implements $ProcessEventCopyWith<$Res> {
+  factory $ProcessStartedCopyWith(ProcessStarted value, $Res Function(ProcessStarted) _then) = _$ProcessStartedCopyWithImpl;
+@useResult
+$Res call({
+ List<TaskModel>? tasks
+});
 
 
+
+
+}
+/// @nodoc
+class _$ProcessStartedCopyWithImpl<$Res>
+    implements $ProcessStartedCopyWith<$Res> {
+  _$ProcessStartedCopyWithImpl(this._self, this._then);
+
+  final ProcessStarted _self;
+  final $Res Function(ProcessStarted) _then;
+
+/// Create a copy of ProcessEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? tasks = freezed,}) {
+  return _then(ProcessStarted(
+tasks: freezed == tasks ? _self._tasks : tasks // ignore: cast_nullable_to_non_nullable
+as List<TaskModel>?,
+  ));
+}
+
+
+}
 
 /// @nodoc
 
 
-class ProcessSubmitted implements ProcessEvent {
+class ProcessSubmitted with DiagnosticableTreeMixin implements ProcessEvent {
   const ProcessSubmitted();
   
 
@@ -214,6 +268,12 @@ class ProcessSubmitted implements ProcessEvent {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'ProcessEvent.submitted'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -225,7 +285,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'ProcessEvent.submitted()';
 }
 
@@ -236,7 +296,7 @@ String toString() {
 
 
 /// @nodoc
-mixin _$ProcessState {
+mixin _$ProcessState implements DiagnosticableTreeMixin {
 
  int get total; int get solved; bool get isSubmitting; bool get isSubmitted; bool get isFetching; bool get isCalculating; SomeFailure? get failure; List<SolvedModel> get results;
 /// Create a copy of ProcessState
@@ -246,6 +306,12 @@ mixin _$ProcessState {
 $ProcessStateCopyWith<ProcessState> get copyWith => _$ProcessStateCopyWithImpl<ProcessState>(this as ProcessState, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'ProcessState'))
+    ..add(DiagnosticsProperty('total', total))..add(DiagnosticsProperty('solved', solved))..add(DiagnosticsProperty('isSubmitting', isSubmitting))..add(DiagnosticsProperty('isSubmitted', isSubmitted))..add(DiagnosticsProperty('isFetching', isFetching))..add(DiagnosticsProperty('isCalculating', isCalculating))..add(DiagnosticsProperty('failure', failure))..add(DiagnosticsProperty('results', results));
+}
 
 @override
 bool operator ==(Object other) {
@@ -257,7 +323,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,total,solved,isSubmitting,isSubmitted,isFetching,isCalculating,failure,const DeepCollectionEquality().hash(results));
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'ProcessState(total: $total, solved: $solved, isSubmitting: $isSubmitting, isSubmitted: $isSubmitted, isFetching: $isFetching, isCalculating: $isCalculating, failure: $failure, results: $results)';
 }
 
@@ -436,7 +502,7 @@ return $default(_that.total,_that.solved,_that.isSubmitting,_that.isSubmitted,_t
 /// @nodoc
 
 
-class _ProcessState extends ProcessState {
+class _ProcessState extends ProcessState with DiagnosticableTreeMixin {
   const _ProcessState({this.total = 0, this.solved = 0, this.isSubmitting = false, this.isSubmitted = false, this.isFetching = false, this.isCalculating = false, this.failure, final  List<SolvedModel> results = const []}): _results = results,super._();
   
 
@@ -462,6 +528,12 @@ class _ProcessState extends ProcessState {
 _$ProcessStateCopyWith<_ProcessState> get copyWith => __$ProcessStateCopyWithImpl<_ProcessState>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'ProcessState'))
+    ..add(DiagnosticsProperty('total', total))..add(DiagnosticsProperty('solved', solved))..add(DiagnosticsProperty('isSubmitting', isSubmitting))..add(DiagnosticsProperty('isSubmitted', isSubmitted))..add(DiagnosticsProperty('isFetching', isFetching))..add(DiagnosticsProperty('isCalculating', isCalculating))..add(DiagnosticsProperty('failure', failure))..add(DiagnosticsProperty('results', results));
+}
 
 @override
 bool operator ==(Object other) {
@@ -473,7 +545,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,total,solved,isSubmitting,isSubmitted,isFetching,isCalculating,failure,const DeepCollectionEquality().hash(_results));
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'ProcessState(total: $total, solved: $solved, isSubmitting: $isSubmitting, isSubmitted: $isSubmitted, isFetching: $isFetching, isCalculating: $isCalculating, failure: $failure, results: $results)';
 }
 

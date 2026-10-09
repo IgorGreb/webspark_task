@@ -9,5 +9,6 @@ sealed class HomeState with _$HomeState {
     @Default(false) bool isValid,
     SomeFailure? failure,
     @Default(HomeStatus.initial) HomeStatus status,
+    @Default(null) List<TaskModel>? tasks,
   }) = _HomeState;
 }

@@ -3,6 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:webspark_task/core/validators/url_validator.dart';
 import 'package:webspark_task/shared/models/failure_model/some_failure.dart';
+import 'package:webspark_task/shared/models/task_model.dart';
+import 'package:webspark_task/shared/repositories/i_path_repository.dart';
 import 'package:webspark_task/shared/repositories/i_url_repository.dart';
 
 part 'home_event.dart';
@@ -11,12 +13,14 @@ part 'home_bloc.freezed.dart';
 
 @injectable
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc(this._urlRepository) : super(_initialState(_urlRepository)) {
+  HomeBloc(this._urlRepository, this._pathRepository)
+    : super(_initialState(_urlRepository)) {
     on<HomeUrlChanged>(_onUrlChanged);
     on<HomeSubmitted>(_onSubmitted);
   }
 
   final IUrlRepository _urlRepository;
+  final IPathRepository _pathRepository;
 
   static HomeState _initialState(IUrlRepository repository) {
     final result = repository.getUrl();
@@ -34,6 +38,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         url: url,
         isValid: UrlValidator.isValid(url),
         failure: null,
+
+        tasks: null,
         status: HomeStatus.initial,
       ),
     );
@@ -60,18 +66,37 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       state.copyWith(
         isValid: true,
         failure: null,
+        tasks: null,
         status: HomeStatus.submitting,
       ),
     );
 
-    final result = await _urlRepository.saveUrl(url);
+    // Validate the URL against the real server BEFORE leaving Home:
+    // save it, then preload tasks. On any failure we stay on Home
+    // with the error (offline/server) + Try Again, instead of
+    // navigating to Process and failing there.
+    final saved = await _urlRepository.saveUrl(url);
+    final saveFailure = saved.fold((failure) => failure, (_) => null);
+    if (saveFailure != null) {
+      emit(state.copyWith(failure: saveFailure, status: HomeStatus.failure));
+      return;
+    }
 
-    result.fold(
+    final tasksResult = await _pathRepository.fetchTasks(url);
+
+    tasksResult.fold(
       (failure) =>
           emit(state.copyWith(failure: failure, status: HomeStatus.failure)),
-      (_) => emit(
-        state.copyWith(url: url, failure: null, status: HomeStatus.success),
+      (tasks) => emit(
+        state.copyWith(
+          url: url,
+          failure: null,
+          tasks: tasks,
+          status: HomeStatus.success,
+        ),
       ),
     );
   }
+
+  List<TaskModel>? get preloadedTasks => state.tasks;
 }

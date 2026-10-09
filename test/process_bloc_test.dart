@@ -50,12 +50,14 @@ class FakePathRepository implements IPathRepository {
   List<TaskModel> tasks;
   SomeFailure? fetchFailure;
   SomeFailure? submitFailure;
+  int fetchCalls = 0;
   List<SubmitRequestModel>? lastSubmitted;
 
   @override
   Future<Either<SomeFailure, List<TaskModel>>> fetchTasks(
     String baseUrl,
   ) async {
+    fetchCalls++;
     final failure = fetchFailure;
     if (failure != null) return Left(failure);
     return Right(tasks);
@@ -241,6 +243,19 @@ void main() {
 
     expect(done.failure, isNull);
     expect(path.lastSubmitted, hasLength(1));
+    await bloc.close();
+  });
+
+  test('preloaded tasks skip fetch and solve directly', () async {
+    final path = FakePathRepository(tasks: [_task('should-not-fetch')]);
+    final bloc = ProcessBloc(FakeUrlRepository(url: _validUrl), path)
+      ..add(ProcessEvent.started(tasks: [_task('a')]));
+
+    final ready = await bloc.stream.firstWhere((s) => s.isReady);
+    expect(path.fetchCalls, 0);
+    expect(ready.total, 1);
+    expect(ready.results, hasLength(1));
+    expect(ready.results.first.id, 'a');
     await bloc.close();
   });
 }
