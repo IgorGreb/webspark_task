@@ -50,4 +50,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyResultsMessage => 'No results available.';
+
+  @override
+  String get previewScreenTitle => 'Preview screen';
+
+  @override
+  String previewPathLengthLabel(int length) {
+    return 'Path length: $length';
+  }
 }
