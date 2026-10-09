@@ -27,11 +27,13 @@ class HomeView extends StatelessWidget {
         bottomNavigationBar: SafeArea(
           minimum: AppInsets.bottomBarSafeArea,
           child: BlocBuilder<HomeBloc, HomeState>(
-            buildWhen: (previous, current) => previous.status != current.status,
+            buildWhen: (previous, current) =>
+                previous.status != current.status ||
+                previous.isValid != current.isValid,
             builder: (context, state) {
               final isSubmitting = state.status == HomeStatus.submitting;
               return MainBtn(
-                onPressed: isSubmitting
+                onPressed: (isSubmitting || !state.isValid)
                     ? null
                     : () => context.read<HomeBloc>().add(
                         const HomeEvent.submitted(),

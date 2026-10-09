@@ -27,6 +27,10 @@ Future<Either<SomeFailure, T>> eitherFutureHelper<T>(
 
 SomeFailure failureFromStatusCode(int statusCode) {
   switch (statusCode) {
+    case 400:
+    case 405:
+    case 415:
+      return SomeFailure.format;
     case 401:
     case 403:
       return SomeFailure.unauthorized;
@@ -39,8 +43,11 @@ SomeFailure failureFromStatusCode(int statusCode) {
     case 500:
     case 502:
     case 503:
+    case 504:
       return SomeFailure.serverError;
     default:
+      // 3xx (redirects are disabled in the repository) and any other code.
+      if (statusCode >= 300 && statusCode < 400) return SomeFailure.serverError;
       return SomeFailure.unknown;
   }
 }

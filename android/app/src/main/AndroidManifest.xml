@@ -1,8 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Release/profile need explicit INTERNET: debug/profile manifests only
+         cover their own build types. Without this, release APK has no network. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="webspark_task"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"

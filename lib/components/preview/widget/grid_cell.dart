@@ -23,19 +23,21 @@ enum GridCellRole {
 
 /// One square cell of the preview grid with its `(x,y)` coordinates inside.
 ///
-/// The cell is painted with the matching [AppColors] entry and keeps a 1:1
-/// aspect ratio because the parent grid sizes every child equally.
+/// Small fields show the `(x,y)` caption; large ones ([hideLabel]) skip the
+/// text so a 99x99 grid does not build ~10k [Text] + [FittedBox] subtrees.
 class GridCell extends StatelessWidget {
   const GridCell({
     super.key,
     required this.x,
     required this.y,
     this.role = GridCellRole.empty,
+    this.hideLabel = false,
   });
 
   final int x;
   final int y;
   final GridCellRole role;
+  final bool hideLabel;
 
   static const double _labelFontSize = 10;
   static const double _borderWidth = 1;
@@ -59,6 +61,17 @@ class GridCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Fast path for big boards: plain color + border radius via DecoratedBox,
+    // but no per-cell text layout at all.
+    if (hideLabel) {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: _background,
+          border: Border.all(color: AppColors.lockedCell, width: _borderWidth.w),
+          borderRadius: BorderRadius.circular(_radius.r),
+        ),
+      );
+    }
     return DecoratedBox(
       decoration: BoxDecoration(
         color: _background,

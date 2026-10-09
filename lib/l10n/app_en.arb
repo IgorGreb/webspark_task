@@ -116,5 +116,9 @@
   "unknownFailure": "Something went wrong. Please try again.",
   "@unknownFailure": {
     "description": "Generic fallback error message"
+  },
+  "insecureHttpWarning": "Unencrypted http:// connection — results are sent in cleartext.",
+  "@insecureHttpWarning": {
+    "description": "Warning shown when the API base URL uses plain http"
   }
 }

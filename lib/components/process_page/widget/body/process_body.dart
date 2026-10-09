@@ -62,9 +62,11 @@ class ProcessBody extends StatelessWidget {
                       ),
                     ),
                     Center(
-                      child: AppLoader(
-                        size: 100,
-                        value: isBusy ? null : state.progress / 100,
+                      child: RepaintBoundary(
+                        child: AppLoader(
+                          size: 100,
+                          value: isBusy ? null : state.progress / 100,
+                        ),
                       ),
                     ),
                     if (state.failure != null) ...[

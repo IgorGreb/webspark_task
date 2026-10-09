@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:webspark_task/components/preview/widget/grid_cell.dart';
+import 'package:webspark_task/shared/models/point_model.dart';
 import 'package:webspark_task/shared/models/solved_model.dart';
 
 part 'preview_event.dart';
@@ -15,6 +16,13 @@ class PreviewBloc extends Bloc<PreviewEvent, PreviewState> {
   }
 
   void _onStarted(PreviewStarted event, Emitter<PreviewState> emit) {
-    emit(PreviewState(solved: event.solved));
+    final solved = event.solved;
+    emit(
+      PreviewState(
+        solved: solved,
+        pathKeys: PreviewState.keysOf(solved),
+        label: PreviewState.buildPathLabel(solved.steps),
+      ),
+    );
   }
 }

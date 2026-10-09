@@ -283,7 +283,11 @@ $SolvedModelCopyWith<$Res> get solved {
 /// @nodoc
 mixin _$PreviewState {
 
- SolvedModel? get solved;
+ SolvedModel? get solved;// O(1) cell lookup: step keys `y * 256 + x` precomputed once, so a 99x99
+// grid (9801 cells) no longer does steps.any() per cell (~100M compares).
+ Set<int> get pathKeys;// Memoized label: building "(x,y)->..." for 10k steps per rebuild
+// allocates megabytes; cap it and compute once.
+ String get label;
 /// Create a copy of PreviewState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -294,16 +298,16 @@ $PreviewStateCopyWith<PreviewState> get copyWith => _$PreviewStateCopyWithImpl<P
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PreviewState&&(identical(other.solved, solved) || other.solved == solved));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PreviewState&&(identical(other.solved, solved) || other.solved == solved)&&const DeepCollectionEquality().equals(other.pathKeys, pathKeys)&&(identical(other.label, label) || other.label == label));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,solved);
+int get hashCode => Object.hash(runtimeType,solved,const DeepCollectionEquality().hash(pathKeys),label);
 
 @override
 String toString() {
-  return 'PreviewState(solved: $solved)';
+  return 'PreviewState(solved: $solved, pathKeys: $pathKeys, label: $label)';
 }
 
 
@@ -314,7 +318,7 @@ abstract mixin class $PreviewStateCopyWith<$Res>  {
   factory $PreviewStateCopyWith(PreviewState value, $Res Function(PreviewState) _then) = _$PreviewStateCopyWithImpl;
 @useResult
 $Res call({
- SolvedModel? solved
+ SolvedModel? solved, Set<int> pathKeys, String label
 });
 
 
@@ -331,10 +335,12 @@ class _$PreviewStateCopyWithImpl<$Res>
 
 /// Create a copy of PreviewState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? solved = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? solved = freezed,Object? pathKeys = null,Object? label = null,}) {
   return _then(_self.copyWith(
 solved: freezed == solved ? _self.solved : solved // ignore: cast_nullable_to_non_nullable
-as SolvedModel?,
+as SolvedModel?,pathKeys: null == pathKeys ? _self.pathKeys : pathKeys // ignore: cast_nullable_to_non_nullable
+as Set<int>,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 /// Create a copy of PreviewState
@@ -431,10 +437,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SolvedModel? solved)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SolvedModel? solved,  Set<int> pathKeys,  String label)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PreviewState() when $default != null:
-return $default(_that.solved);case _:
+return $default(_that.solved,_that.pathKeys,_that.label);case _:
   return orElse();
 
 }
@@ -452,10 +458,10 @@ return $default(_that.solved);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SolvedModel? solved)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SolvedModel? solved,  Set<int> pathKeys,  String label)  $default,) {final _that = this;
 switch (_that) {
 case _PreviewState():
-return $default(_that.solved);case _:
+return $default(_that.solved,_that.pathKeys,_that.label);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -472,10 +478,10 @@ return $default(_that.solved);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SolvedModel? solved)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SolvedModel? solved,  Set<int> pathKeys,  String label)?  $default,) {final _that = this;
 switch (_that) {
 case _PreviewState() when $default != null:
-return $default(_that.solved);case _:
+return $default(_that.solved,_that.pathKeys,_that.label);case _:
   return null;
 
 }
@@ -487,10 +493,24 @@ return $default(_that.solved);case _:
 
 
 class _PreviewState extends PreviewState {
-  const _PreviewState({this.solved}): super._();
+  const _PreviewState({this.solved, final  Set<int> pathKeys = const <int>{}, this.label = ''}): _pathKeys = pathKeys,super._();
   
 
 @override final  SolvedModel? solved;
+// O(1) cell lookup: step keys `y * 256 + x` precomputed once, so a 99x99
+// grid (9801 cells) no longer does steps.any() per cell (~100M compares).
+ final  Set<int> _pathKeys;
+// O(1) cell lookup: step keys `y * 256 + x` precomputed once, so a 99x99
+// grid (9801 cells) no longer does steps.any() per cell (~100M compares).
+@override@JsonKey() Set<int> get pathKeys {
+  if (_pathKeys is EqualUnmodifiableSetView) return _pathKeys;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_pathKeys);
+}
+
+// Memoized label: building "(x,y)->..." for 10k steps per rebuild
+// allocates megabytes; cap it and compute once.
+@override@JsonKey() final  String label;
 
 /// Create a copy of PreviewState
 /// with the given fields replaced by the non-null parameter values.
@@ -502,16 +522,16 @@ _$PreviewStateCopyWith<_PreviewState> get copyWith => __$PreviewStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PreviewState&&(identical(other.solved, solved) || other.solved == solved));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PreviewState&&(identical(other.solved, solved) || other.solved == solved)&&const DeepCollectionEquality().equals(other._pathKeys, _pathKeys)&&(identical(other.label, label) || other.label == label));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,solved);
+int get hashCode => Object.hash(runtimeType,solved,const DeepCollectionEquality().hash(_pathKeys),label);
 
 @override
 String toString() {
-  return 'PreviewState(solved: $solved)';
+  return 'PreviewState(solved: $solved, pathKeys: $pathKeys, label: $label)';
 }
 
 
@@ -522,7 +542,7 @@ abstract mixin class _$PreviewStateCopyWith<$Res> implements $PreviewStateCopyWi
   factory _$PreviewStateCopyWith(_PreviewState value, $Res Function(_PreviewState) _then) = __$PreviewStateCopyWithImpl;
 @override @useResult
 $Res call({
- SolvedModel? solved
+ SolvedModel? solved, Set<int> pathKeys, String label
 });
 
 
@@ -539,10 +559,12 @@ class __$PreviewStateCopyWithImpl<$Res>
 
 /// Create a copy of PreviewState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? solved = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? solved = freezed,Object? pathKeys = null,Object? label = null,}) {
   return _then(_PreviewState(
 solved: freezed == solved ? _self.solved : solved // ignore: cast_nullable_to_non_nullable
-as SolvedModel?,
+as SolvedModel?,pathKeys: null == pathKeys ? _self._pathKeys : pathKeys // ignore: cast_nullable_to_non_nullable
+as Set<int>,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

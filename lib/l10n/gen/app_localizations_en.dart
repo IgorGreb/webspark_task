@@ -97,4 +97,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownFailure => 'Something went wrong. Please try again.';
+
+  @override
+  String get insecureHttpWarning =>
+      'Unencrypted http:// connection — results are sent in cleartext.';
 }

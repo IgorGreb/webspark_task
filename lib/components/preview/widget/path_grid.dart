@@ -23,6 +23,9 @@ class PathGrid extends StatelessWidget {
   static const double _gap = 2;
   static const double _minCellSize = 24;
 
+  /// Above this board size coordinates are hidden (see [GridCell.hideLabel]).
+  static const int _labelThreshold = 20;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -36,11 +39,18 @@ class PathGrid extends StatelessWidget {
         // get too small to read, then let the viewer scroll/zoom it.
         final cell = max(_minCellSize.w, side / size);
         final gridSide = cell * size;
+        final hideLabels = size > _labelThreshold;
 
         Widget grid = SizedBox.square(
           dimension: gridSide,
           child: GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
+            // Large boards recycle off-screen cells instead of keeping all
+            // ~10k widgets alive in one layout pass.
+            addAutomaticKeepAlives: false,
+            addRepaintBoundaries: true,
+            addSemanticIndexes: false,
+            cacheExtent: cell * 4,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: size,
               mainAxisSpacing: _gap.w,
@@ -56,6 +66,7 @@ class PathGrid extends StatelessWidget {
                 x: x,
                 y: y,
                 role: roleAt(x, y),
+                hideLabel: hideLabels,
               );
             },
           ),
