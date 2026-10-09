@@ -44,10 +44,10 @@ void main() {
       expect(state.size, 3);
     });
 
-    test('path label joins steps with spaced arrows', () {
+    test('path label joins steps without spaces', () {
       final state = PreviewState(solved: _solved);
 
-      expect(state.pathLabel, '(0,0) -> (1,0) -> (2,2)');
+      expect(state.pathLabel, '(0,0)->(1,0)->(2,2)');
     });
 
     test('isEmpty is false when a path exists', () {

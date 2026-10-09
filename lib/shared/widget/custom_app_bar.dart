@@ -10,7 +10,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleWidget,
     this.leading,
     this.actions,
-    this.backgroundColor = AppColors.buttonBackgroundColor,
+    this.backgroundColor = AppColors.primaryColor,
     this.foregroundColor = AppColors.buttonTextColor,
     this.titleStyle,
   }) : assert(

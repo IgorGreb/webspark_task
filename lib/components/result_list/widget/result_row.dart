@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
+import 'package:webspark_task/shared/constants/theme/app_colors.dart';
 import 'package:webspark_task/shared/models/solved_model.dart';
 import 'package:webspark_task/shared/navigation/app_router.dart';
 
-/// A single solved task row. Tapping it opens the Preview screen for
-/// [solved].
 class ResultRow extends StatelessWidget {
   const ResultRow({super.key, required this.solved});
 
@@ -35,7 +34,7 @@ class ResultRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const Divider(height: 1, thickness: 1),
+          const Divider(height: 1, thickness: 1, color: AppColors.dividerColor),
         ],
       ),
     );

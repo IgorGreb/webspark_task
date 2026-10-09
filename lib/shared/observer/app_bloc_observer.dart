@@ -1,11 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Global observer for all BLoCs/Cubits in the app.
-///
-/// Wired up in [bootstrap] (see `lib/bootstrap.dart`).
-/// In debug it prints events / transitions / errors,
-/// in release it stays silent (forward to Crashlytics/Sentry here).
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
 

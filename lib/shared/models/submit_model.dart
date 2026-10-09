@@ -4,9 +4,6 @@ import 'package:webspark_task/shared/models/point_model.dart';
 part 'submit_model.freezed.dart';
 part 'submit_model.g.dart';
 
-/// Single step of the POST body.
-///
-/// The API expects string coordinates here: `{"x": "0", "y": "0"}`.
 @freezed
 sealed class SubmitStepModel with _$SubmitStepModel {
   const factory SubmitStepModel({required String x, required String y}) =
@@ -29,8 +26,6 @@ sealed class SubmitResultModel with _$SubmitResultModel {
   factory SubmitResultModel.fromJson(Map<String, dynamic> json) =>
       _$SubmitResultModelFromJson(json);
 
-  /// Builds the result from solved points, formatting `path` as
-  /// `(x,y)->...` without spaces.
   factory SubmitResultModel.fromPoints(List<PointModel> points) {
     return SubmitResultModel(
       steps: points.map(SubmitStepModel.fromPoint).toList(),
@@ -39,7 +34,6 @@ sealed class SubmitResultModel with _$SubmitResultModel {
   }
 }
 
-/// POST body item: `{"id": ..., "result": {"steps": [...], "path": ...}}`.
 @freezed
 sealed class SubmitRequestModel with _$SubmitRequestModel {
   const factory SubmitRequestModel({
@@ -51,7 +45,6 @@ sealed class SubmitRequestModel with _$SubmitRequestModel {
       _$SubmitRequestModelFromJson(json);
 }
 
-/// POST response item: `{"id": ..., "correct": bool}`.
 @freezed
 sealed class SubmitResponseModel with _$SubmitResponseModel {
   const factory SubmitResponseModel({

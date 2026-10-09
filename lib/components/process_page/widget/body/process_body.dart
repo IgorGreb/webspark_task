@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:webspark_task/components/process_page/bloc/process_bloc.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
+import 'package:webspark_task/shared/constants/theme/app_colors.dart';
 import 'package:webspark_task/shared/widget/app_loader.dart';
 import 'package:webspark_task/shared/widget/error_banner.dart';
 
@@ -18,6 +19,7 @@ class ProcessBody extends StatelessWidget {
           previous.isFetching != current.isFetching ||
           previous.isCalculating != current.isCalculating ||
           previous.isSubmitting != current.isSubmitting ||
+          previous.isReady != current.isReady ||
           previous.progress != current.progress ||
           previous.failure != current.failure,
       builder: (context, state) {
@@ -25,62 +27,53 @@ class ProcessBody extends StatelessWidget {
             ? l10n.calculationsFinished
             : l10n.calculationsInProgress;
 
-        return SingleChildScrollView(
-          padding: AppInsets.homeBody,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                header,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: AppSizes.bodyFontSize.sp),
-              ),
-              SizedBox(height: 12.h),
-              TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 300),
-                tween: Tween<double>(begin: 0, end: state.progress.toDouble()),
-                builder: (context, value, child) {
-                  if (state.isSubmitting) {
-                    return Center(
-                      child: Text(
-                        l10n.sendingResults,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: AppSizes.inputFontSize.sp),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: AppInsets.homeBody,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      header,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: AppSizes.bodyFontSize.sp),
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      '${state.progress}%',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: AppSizes.inputFontSize.sp,
+                        fontWeight: FontWeight.w600,
                       ),
-                    );
-                  }
-
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${value.toInt()}%',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: AppSizes.inputFontSize.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: AppColors.dividerColor,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey.shade400,
-                        ),
+                    ),
+                    Center(
+                      child: AppLoader(
+                        size: 100,
+                        value: state.isSubmitting ? null : state.progress / 100,
                       ),
-                      AppLoader(size: 100, value: value / 100),
+                    ),
+                    if (state.failure != null) ...[
+                      SizedBox(height: 12.h),
+                      ErrorBanner(failure: state.failure!),
                     ],
-                  );
-                },
+                  ],
+                ),
               ),
-              if (state.failure != null) ...[
-                SizedBox(height: 12.h),
-                ErrorBanner(failure: state.failure!),
-              ],
-              SizedBox(height: 12.h),
-            ],
-          ),
+            );
+          },
         );
       },
     );

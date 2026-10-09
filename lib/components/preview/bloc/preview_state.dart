@@ -6,25 +6,18 @@ abstract class PreviewState with _$PreviewState {
 
   const PreviewState._();
 
-  /// Side of the square field; `0` while no model is loaded yet.
   int get size => solved?.field.length ?? 0;
 
-  /// `true` when there is no model at all (nothing was selected).
   bool get hasNoModel => solved == null;
 
-  /// `true` when there is nothing to draw (no model or an empty path).
   bool get isEmpty => solved == null || solved!.steps.isEmpty;
 
-  /// Number of steps in the solved path.
   int get stepCount => solved?.steps.length ?? 0;
 
-  /// Human readable path with spaces around the arrows: `(0,0) -> (1,1)`.
   String get pathLabel => solved == null
       ? ''
-      : solved!.steps.map((p) => '(${p.x},${p.y})').join(' -> ');
+      : solved!.steps.map((p) => '(${p.x},${p.y})').join('->');
 
-  /// Maps a cell of the field onto its visual role so the grid can pick the
-  /// matching colour from [GridCellRole].
   GridCellRole roleAt(int x, int y) {
     final model = solved;
     if (model == null) return GridCellRole.empty;

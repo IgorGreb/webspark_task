@@ -5,7 +5,7 @@ import 'package:webspark_task/shared/constants/theme/app_colors.dart';
 abstract class AppTheme {
   static ThemeData get light {
     const colorScheme = ColorScheme.light(
-      primary: AppColors.buttonBackgroundColor,
+      primary: AppColors.primaryColor,
       onPrimary: AppColors.buttonTextColor,
       surface: AppColors.emptyCell,
       onSurface: AppColors.lockedCell,
@@ -16,7 +16,7 @@ abstract class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.emptyCell,
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.buttonBackgroundColor,
+        backgroundColor: AppColors.primaryColor,
         foregroundColor: AppColors.buttonTextColor,
         elevation: 0,
         scrolledUnderElevation: 0,

@@ -8,11 +8,6 @@ part 'preview_event.dart';
 part 'preview_state.dart';
 part 'preview_bloc.freezed.dart';
 
-/// Drives the Preview screen: receives the [SolvedModel] picked on the
-/// Result list and exposes everything the grid needs to paint itself.
-///
-/// The colour mapping (`field + start/end + steps` -> cell role) lives in the
-/// state so the widget layer stays a pure renderer.
 @injectable
 class PreviewBloc extends Bloc<PreviewEvent, PreviewState> {
   PreviewBloc() : super(const PreviewState()) {

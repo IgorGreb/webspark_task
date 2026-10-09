@@ -8,7 +8,6 @@ import 'package:webspark_task/shared/models/submit_model.dart';
 import 'package:webspark_task/shared/models/task_model.dart';
 import 'package:webspark_task/shared/repositories/i_path_repository.dart';
 
-/// Expected OK status of the API responses.
 const int _statusOk = 200;
 
 @LazySingleton(as: IPathRepository)
