@@ -14,10 +14,7 @@ void main() {
       expect(UrlValidator.isValid(''), isFalse);
       expect(UrlValidator.isValid('ftp://example.com'), isFalse);
       expect(UrlValidator.isValid('not a url'), isFalse);
-      expect(
-        UrlValidator.isValid('https://user:pass@example.com/'),
-        isFalse,
-      );
+      expect(UrlValidator.isValid('https://user:pass@example.com/'), isFalse);
       expect(UrlValidator.isValid('http://[invalid'), isFalse);
       expect(
         UrlValidator.isValid('https://example.com/${'a' * 2100}'),
@@ -57,14 +54,8 @@ void main() {
     });
 
     test('does not block public lookalikes of private ranges', () {
-      expect(
-        UrlValidator.isSafeForRequest('https://172.32.0.1/'),
-        isTrue,
-      );
-      expect(
-        UrlValidator.isSafeForRequest('https://192.169.1.1/'),
-        isTrue,
-      );
+      expect(UrlValidator.isSafeForRequest('https://172.32.0.1/'), isTrue);
+      expect(UrlValidator.isSafeForRequest('https://192.169.1.1/'), isTrue);
     });
   });
 

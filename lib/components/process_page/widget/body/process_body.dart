@@ -15,19 +15,16 @@ class ProcessBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return BlocBuilder<ProcessBloc, ProcessState>(
+      // Structural changes only: header text and the retry block. Progress
+      // ticks are handled by the scoped builder below so a throttled emit
+      // rebuilds three widgets instead of the whole body.
       buildWhen: (previous, current) =>
-          previous.isFetching != current.isFetching ||
-          previous.isCalculating != current.isCalculating ||
-          previous.isSubmitting != current.isSubmitting ||
           previous.isReady != current.isReady ||
-          previous.progress != current.progress ||
           previous.failure != current.failure,
       builder: (context, state) {
         final header = state.isReady
             ? l10n.calculationsFinished
             : l10n.calculationsInProgress;
-  
-        final isBusy = state.isFetching || state.isSubmitting;
 
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -45,29 +42,47 @@ class ProcessBody extends StatelessWidget {
                       style: TextStyle(fontSize: AppSizes.bodyFontSize.sp),
                     ),
                     SizedBox(height: 12.h),
-                    Text(
-                      '${state.progress}%',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: AppSizes.inputFontSize.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: AppColors.dividerColor,
-                      ),
-                    ),
-                    Center(
-                      child: RepaintBoundary(
-                        child: AppLoader(
-                          size: 100,
-                          value: isBusy ? null : state.progress / 100,
-                        ),
-                      ),
+                    // The only subtree touched by the throttled progress
+                    // ticks: percent text, divider and spinner.
+                    BlocBuilder<ProcessBloc, ProcessState>(
+                      buildWhen: (previous, current) =>
+                          previous.progress != current.progress ||
+                          previous.isFetching != current.isFetching ||
+                          previous.isSubmitting != current.isSubmitting,
+                      builder: (context, state) {
+                        final isBusy =
+                            state.isFetching || state.isSubmitting;
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              '${state.progress}%',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: AppSizes.inputFontSize.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              child: Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: AppColors.dividerColor,
+                              ),
+                            ),
+                            Center(
+                              child: RepaintBoundary(
+                                child: AppLoader(
+                                  size: 100,
+                                  value: isBusy ? null : state.progress / 100,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     if (state.failure != null) ...[
                       SizedBox(height: 12.h),

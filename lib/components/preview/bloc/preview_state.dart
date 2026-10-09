@@ -64,9 +64,7 @@ abstract class PreviewState with _$PreviewState {
 
   static Set<int> keysOf(SolvedModel? model) {
     if (model == null) return const <int>{};
-    return <int>{
-      for (final p in model.steps) p.y * 256 + p.x,
-    };
+    return <int>{for (final p in model.steps) p.y * 256 + p.x};
   }
 
   GridCellRole roleAt(int x, int y) {

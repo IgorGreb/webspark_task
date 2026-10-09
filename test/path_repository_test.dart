@@ -6,7 +6,8 @@ import 'package:webspark_task/shared/models/failure_model/failure_model.dart';
 import 'package:webspark_task/shared/models/submit_model.dart';
 import 'package:webspark_task/shared/repositories/path_repository.dart';
 
-const _okTasks = '{"error":false,"data":[{"id":"a","field":[".X.",".X.","..."],'
+const _okTasks =
+    '{"error":false,"data":[{"id":"a","field":[".X.",".X.","..."],'
     '"start":{"x":2,"y":1},"end":{"x":0,"y":2}}]}';
 
 http.Client _client(
@@ -81,7 +82,8 @@ void main() {
     test('oversized task list is rejected as format', () async {
       final item =
           '{"id":"t","field":["..",".."],"start":{"x":0,"y":0},"end":{"x":1,"y":1}}';
-      final body = '{"error":false,"data":[${List.filled(501, item).join(',')}]}';
+      final body =
+          '{"error":false,"data":[${List.filled(501, item).join(',')}]}';
       final repo = PathRepository(_client(body));
 
       final result = await repo.fetchTasks('https://example.com/api');
@@ -90,7 +92,8 @@ void main() {
     });
 
     test('invalid field charset is rejected as format', () async {
-      const body = '{"error":false,"data":[{"id":"a","field":["ab","cd"],'
+      const body =
+          '{"error":false,"data":[{"id":"a","field":["ab","cd"],'
           '"start":{"x":0,"y":0},"end":{"x":1,"y":1}}]}';
       final repo = PathRepository(_client(body));
 

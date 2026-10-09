@@ -118,7 +118,8 @@ class _HomeBodyState extends State<HomeBody> {
             // While validating the URL against the server show an inline
             // spinner so the tap has visible feedback before navigation.
             BlocBuilder<HomeBloc, HomeState>(
-              buildWhen: (previous, current) => previous.status != current.status,
+              buildWhen: (previous, current) =>
+                  previous.status != current.status,
               builder: (context, state) {
                 if (state.status != HomeStatus.submitting) {
                   return const SizedBox.shrink();
