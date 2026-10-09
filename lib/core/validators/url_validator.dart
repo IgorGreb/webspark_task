@@ -1,17 +1,34 @@
+import 'package:webspark_task/features/mocks/mock_tasks.dart';
+
 /// URL validation + SSRF hardening.
 /// [validate] keeps the UX-level format check (scheme + host).
 /// [isSafeForRequest] additionally blocks non-routable targets
 /// (localhost / LAN / cloud metadata) so the app never fetches them.
+///
+/// `mock://...` URLs are a local debug harness (see `MockTasks` in
+/// `features/mocks/mock_tasks.dart`): they never hit the network, so they
+/// bypass the SSRF block but are only honored by the mock-aware repository
+/// decorator in debug builds.
 abstract class UrlValidator {
   static const int maxUrlLength = 2048;
+
+  /// Schemes allowed for typing into the Home field (`mock` = local harness).
+  static bool _isAllowedScheme(String scheme) =>
+      scheme == 'http' || scheme == 'https' || scheme == 'mock';
 
   static String? validate(String? value) {
     final trimmed = (value ?? '').trim();
     if (trimmed.isEmpty) return 'empty';
     if (trimmed.length > maxUrlLength) return 'invalid';
     final uri = Uri.tryParse(trimmed);
-    if (uri == null || !uri.hasScheme || uri.host.isEmpty) return 'invalid';
-    if (uri.scheme != 'http' && uri.scheme != 'https') return 'invalid';
+    if (uri == null || !uri.hasScheme) return 'invalid';
+    if (!_isAllowedScheme(uri.scheme)) return 'invalid';
+    // mock:// presets carry no host requirement (e.g. `mock://large`).
+    if (uri.scheme == 'mock') {
+      if (uri.userInfo.isNotEmpty) return 'invalid';
+      return null;
+    }
+    if (uri.host.isEmpty) return 'invalid';
     // Reject embedded credentials like https://user:pass@host/.
     if (uri.userInfo.isNotEmpty) return 'invalid';
     return null;
@@ -20,9 +37,12 @@ abstract class UrlValidator {
   static bool isValid(String? value) => validate(value) == null;
 
   /// True when the URL is well-formed AND points at a public host.
+  /// Mock URLs are always "safe": they are served locally, never fetched.
   static bool isSafeForRequest(String? value) {
-    if (!isValid(value)) return false;
-    final host = Uri.tryParse(value!.trim())?.host ?? '';
+    final trimmed = (value ?? '').trim();
+    if (!isValid(trimmed)) return false;
+    if (MockTasks.isMockUrl(trimmed)) return true;
+    final host = Uri.tryParse(trimmed)?.host ?? '';
     return !isBlockedHost(host);
   }
 
@@ -38,8 +58,9 @@ abstract class UrlValidator {
     if (bare == 'localhost' || bare == 'localhost.localdomain') return true;
     if (bare == '::1' || bare == '0.0.0.0') return true;
     // IPv4 literal checks.
-    final v4 = RegExp(r'^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$')
-        .firstMatch(bare);
+    final v4 = RegExp(
+      r'^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$',
+    ).firstMatch(bare);
     if (v4 != null) {
       final o = <int>[
         int.parse(v4.group(1)!),
@@ -50,7 +71,9 @@ abstract class UrlValidator {
       if (o.any((e) => e > 255)) return true;
       if (o[0] == 10) return true; // 10/8
       if (o[0] == 127) return true; // loopback
-      if (o[0] == 169 && o[1] == 254) return true; // link-local / cloud metadata
+      if (o[0] == 169 && o[1] == 254) {
+        return true; // link-local / cloud metadata
+      }
       if (o[0] == 192 && o[1] == 168) return true; // 192.168/16
       if (o[0] == 172 && o[1] >= 16 && o[1] <= 31) return true; // 172.16/12
       if (o[0] == 0 || o[0] >= 224) return true; // 0/8, multicast, reserved

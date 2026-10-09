@@ -19,7 +19,7 @@ const int _maxTasks = 500;
 const int _maxFieldSize = 99;
 const int _maxIdLength = 128;
 
-@LazySingleton(as: IPathRepository)
+@injectable
 class PathRepository implements IPathRepository {
   PathRepository(this._client);
 
