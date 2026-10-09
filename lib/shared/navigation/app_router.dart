@@ -5,7 +5,7 @@ import 'package:webspark_task/shared/models/solved_model.dart';
 import 'package:webspark_task/components/result_list/view/result_list_view.dart';
 import 'package:webspark_task/components/home_page/widget/bloc_provider/home_bloc_provider.dart';
 import 'package:webspark_task/components/not_found/view/not_found_view.dart';
-import 'package:webspark_task/components/preview/view/preview_view.dart';
+import 'package:webspark_task/components/preview/widget/bloc_provider/preview_bloc_provider.dart';
 import 'package:webspark_task/components/preview/widget/preview_mocks.dart';
 import 'package:webspark_task/components/process_page/widget/bloc_provider/process_bloc_provider.dart';
 
@@ -46,7 +46,7 @@ final List<RouteBase> appRoutes = <RouteBase>[
     path: KRoute.preview.path,
     pageBuilder: (context, state) {
       final solved = state.extra as SolvedModel? ?? PreviewMocks.solved;
-      return NoTransitionPage(child: PreviewView(solved: solved));
+      return NoTransitionPage(child: PreviewBlocProvider(solved: solved));
     },
   ),
 ];

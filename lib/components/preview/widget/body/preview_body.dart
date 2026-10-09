@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:webspark_task/components/preview/bloc/preview_bloc.dart';
 import 'package:webspark_task/components/preview/widget/path_grid.dart';
-import 'package:webspark_task/components/preview/widget/preview_mocks.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
 import 'package:webspark_task/shared/constants/theme/app_colors.dart';
-import 'package:webspark_task/shared/models/solved_model.dart';
 
 /// Body of the Preview screen: the square field on top and the human
-/// readable path right under it.
+/// readable path right under it. Pure renderer of [PreviewState].
 class PreviewBody extends StatelessWidget {
-  const PreviewBody({super.key, required this.solved});
+  const PreviewBody({super.key, required this.state});
 
-  final SolvedModel solved;
+  final PreviewState state;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final steps = solved.steps;
-    final pathLabel = steps.isEmpty
-        ? l10n.emptyResultsMessage
-        : steps.map((p) => '(${p.x},${p.y})').join(' -> ');
 
     return SafeArea(
       child: Padding(
@@ -31,8 +26,8 @@ class PreviewBody extends StatelessWidget {
             Expanded(
               child: PathGrid(
                 key: const ValueKey('preview_grid'),
-                size: solved.field.length,
-                roleAt: (x, y) => PreviewMocks.roleOf(solved, x, y),
+                size: state.size,
+                roleAt: state.roleAt,
               ),
             ),
             SizedBox(height: 16.h),
@@ -47,7 +42,7 @@ class PreviewBody extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    l10n.previewPathLengthLabel(steps.length),
+                    l10n.previewPathLengthLabel(state.stepCount),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: AppSizes.bodyFontSize.sp,
@@ -56,7 +51,7 @@ class PreviewBody extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    pathLabel,
+                    state.isEmpty ? l10n.emptyResultsMessage : state.pathLabel,
                     textAlign: TextAlign.center,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,

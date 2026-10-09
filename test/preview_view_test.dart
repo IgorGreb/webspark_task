@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webspark_task/components/preview/view/preview_view.dart';
+import 'package:webspark_task/components/preview/widget/bloc_provider/preview_bloc_provider.dart';
 import 'package:webspark_task/components/preview/widget/grid_cell.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/di/injection.dart';
@@ -36,21 +36,14 @@ Future<void> _pump(WidgetTester tester, SolvedModel solved) async {
         supportedLocales: supportedLocales,
         home: child,
       ),
-      child: PreviewView(solved: solved),
+      child: PreviewBlocProvider(solved: solved),
     ),
   );
   await tester.pumpAndSettle();
 }
 
-/// Builds a private router over the shared [appRoutes] list so each test
-/// navigates on a clean stack and never leaks `extra` to the next one.
-GoRouter _newRouter() => GoRouter(
-  initialLocation: KRoute.home.path,
-  routes: appRoutes,
-);
-
-/// Mounts [router] so `/preview` is exercised end to end.
-Future<void> _pumpRouter(WidgetTester tester, GoRouter router) async {
+/// Mounts the real app router so `/preview` is exercised end to end.
+Future<void> _pumpRouter(WidgetTester tester) async {
   await tester.pumpWidget(
     ScreenUtilInit(
       designSize: const Size(375, 812),
@@ -143,7 +136,7 @@ void main() {
             supportedLocales: supportedLocales,
             home: child,
           ),
-          child: PreviewView(
+          child: PreviewBlocProvider(
             solved: _solved.copyWith(
               field: const <String>[
                 '.....',
@@ -166,31 +159,37 @@ void main() {
     expect(find.byType(GridCell), findsWidgets);
   });
 
+  testWidgets('large field becomes zoomable and panable', (tester) async {
+    // 20x20 field: 24 * 20 = 480 far exceeds the ~340px viewport, so the
+    // grid overflows and gets wrapped in an InteractiveViewer.
+    await _pump(
+      tester,
+      _solved.copyWith(
+        field: List<String>.filled(20, '.' * 20),
+        start: const PointModel(x: 0, y: 0),
+        end: const PointModel(x: 19, y: 19),
+        steps: const <PointModel>[PointModel(x: 0, y: 0)],
+      ),
+    );
+
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+    // All 400 cells still exist, ready to be panned/zoomed into.
+    expect(find.byType(GridCell), findsNWidgets(20 * 20));
+  });
+
   testWidgets('preview route renders the model passed as extra', (
     tester,
   ) async {
-    final testRouter = _newRouter();
-    await _pumpRouter(tester, testRouter);
+    await _pumpRouter(tester);
+    router.go(KRoute.home.path);
+    await tester.pumpAndSettle();
 
-    testRouter.goNamed(KRoute.preview.name, extra: _solved);
+    router.goNamed(KRoute.preview.name, extra: _solved);
     await tester.pumpAndSettle();
 
     expect(find.byType(PreviewView), findsOneWidget);
     expect(find.text('Preview screen'), findsOneWidget);
     expect(find.byType(GridCell), findsNWidgets(_field.length * _field.length));
     expect(find.text('(0,0) -> (2,2)'), findsOneWidget);
-  });
-
-  testWidgets('preview route falls back to mocks without extra', (
-    tester,
-  ) async {
-    final testRouter = _newRouter();
-    await _pumpRouter(tester, testRouter);
-
-    testRouter.goNamed(KRoute.preview.name);
-    await tester.pumpAndSettle();
-
-    expect(find.byType(PreviewView), findsOneWidget);
-    expect(find.byType(GridCell), findsNWidgets(16));
   });
 }
