@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:webspark_task/components/process_page/bloc/process_bloc.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
+import 'package:webspark_task/shared/constants/theme/app_colors.dart';
 import 'package:webspark_task/shared/widget/app_loader.dart';
 import 'package:webspark_task/shared/widget/error_banner.dart';
 
@@ -26,8 +27,6 @@ class ProcessBody extends StatelessWidget {
             ? l10n.calculationsFinished
             : l10n.calculationsInProgress;
 
-        // Centre the block while it fits, but keep it scrollable on small
-        // screens so a larger text scale never overflows the body.
         return LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
@@ -44,9 +43,6 @@ class ProcessBody extends StatelessWidget {
                       style: TextStyle(fontSize: AppSizes.bodyFontSize.sp),
                     ),
                     SizedBox(height: 12.h),
-                    // The real progress is rendered directly. The previous
-                    // TweenAnimationBuilder(begin: 0, end: progress) restarted
-                    // from 0 on every update, making the number jump back.
                     Text(
                       '${state.progress}%',
                       textAlign: TextAlign.center,
@@ -60,12 +56,9 @@ class ProcessBody extends StatelessWidget {
                       child: Divider(
                         height: 1,
                         thickness: 1,
-                        color: Colors.grey.shade400,
+                        color: AppColors.dividerColor,
                       ),
                     ),
-                    // Determinate ring while calculating, an indeterminate
-                    // spinner while sending. Same widget in the same slot, so
-                    // nothing shifts when the state flips.
                     Center(
                       child: AppLoader(
                         size: 100,

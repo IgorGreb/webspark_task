@@ -39,14 +39,19 @@ class ProcessView extends StatelessWidget {
                 previous.isReady != current.isReady ||
                 previous.isSubmitting != current.isSubmitting,
             builder: (context, state) {
-              if (!state.isReady) return const SizedBox.shrink();
-              return MainBtn(
-                onPressed: state.isSubmitting
-                    ? null
-                    : () => context.read<ProcessBloc>().add(
-                        const ProcessEvent.submitted(),
-                      ),
-                label: l10n.sendResultsToServer,
+              return Visibility(
+                visible: state.isReady,
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                child: MainBtn(
+                  onPressed: state.isSubmitting
+                      ? null
+                      : () => context.read<ProcessBloc>().add(
+                          const ProcessEvent.submitted(),
+                        ),
+                  label: l10n.sendResultsToServer,
+                ),
               );
             },
           ),

@@ -17,8 +17,6 @@ abstract class KRoute {
   static const preview = (name: 'preview', path: '/preview');
 }
 
-/// All destinations of the app. Kept as a plain list so tests can mount a
-/// fresh [GoRouter] instead of sharing the global singleton state.
 final List<RouteBase> appRoutes = <RouteBase>[
   GoRoute(
     name: KRoute.home.name,

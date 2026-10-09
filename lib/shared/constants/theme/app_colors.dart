@@ -10,4 +10,5 @@ abstract class AppColors {
   static const buttonBackgroundColor = Color(0xFF40C4FF);
   static const buttonTextColor = Color(0xFFFFFFFF);
   static const disabledButtonBackgroundColor = Color(0xFFBDBDBD);
+  static const dividerColor = Color(0xFFBDBDBD);
 }

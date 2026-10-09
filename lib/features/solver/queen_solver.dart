@@ -2,8 +2,6 @@ import 'package:webspark_task/shared/models/point_model.dart';
 import 'package:webspark_task/shared/models/solved_model.dart';
 import 'package:webspark_task/shared/models/task_model.dart';
 
-/// Immutable grid point. Kept independent from DTOs so the solver
-/// stays a pure domain piece.
 class Point {
   const Point(this.x, this.y);
 
@@ -21,11 +19,6 @@ class Point {
   String toString() => '($x,$y)';
 }
 
-/// Square playing field. A cell is blocked when it holds `X`,
-/// any other character is free. Coordinates: `x` is the column,
-/// `y` is the row, i.e. the cell is `field[y][x]`.
-///
-/// Size must satisfy `1 < n < 100`.
 class Grid {
   Grid(List<String> rows) : _rows = List<String>.unmodifiable(rows) {
     final n = _rows.length;
@@ -51,16 +44,12 @@ class Grid {
   bool isFree(Point point) => isInside(point) && _rows[point.y][point.x] != 'X';
 }
 
-/// Generates the cells reachable in one queen move.
 abstract class QueenStrategy {
   const QueenStrategy();
 
-  /// Cells the piece may stop at in a single move from [from].
   Iterable<Point> nextPoints(Grid grid, Point from);
 }
 
-/// Slides in all 8 directions until the field edge or a blocked cell,
-/// offering every free cell along the slide as a stop position.
 class QueenSlideStrategy implements QueenStrategy {
   const QueenSlideStrategy();
 
@@ -89,15 +78,11 @@ class QueenSlideStrategy implements QueenStrategy {
   }
 }
 
-/// Breadth-first search over stop cells: the first time [end] is reached
-/// the number of queen moves is minimal.
 class BfsSolver {
   const BfsSolver(this.strategy);
 
   final QueenStrategy strategy;
 
-  /// Shortest move sequence from [start] to [end] including both ends,
-  /// or `null` when either cell is blocked or no path exists.
   List<Point>? solve(Grid grid, Point start, Point end) {
     if (!grid.isFree(start) || !grid.isFree(end)) return null;
     if (start == end) return <Point>[start];
@@ -132,11 +117,6 @@ class BfsSolver {
   }
 }
 
-/// Expands a path of queen "turn" points into every single cell on the way.
-///
-/// The BFS keeps only the stop cells (the fewest queen moves), but the API
-/// validates the field cell by cell, so between two consecutive turns every
-/// crossed cell must be listed as well.
 List<Point> expandFullPath(List<Point> turns) {
   if (turns.length <= 1) return turns;
 
@@ -157,13 +137,6 @@ List<Point> expandFullPath(List<Point> turns) {
   return full;
 }
 
-/// Solves a [TaskModel] into a [SolvedModel], or returns `null`
-/// when the path does not exist.
-///
-/// Throws [ArgumentError] when the field size violates `1 < n < 100`.
-///
-/// [SolvedModel.steps] holds every cell of the path (not only the queen
-/// turns), matching the format the WebSpark API expects.
 SolvedModel? solveTask(TaskModel task) {
   final grid = Grid(task.field);
   const solver = BfsSolver(QueenSlideStrategy());
@@ -178,8 +151,6 @@ SolvedModel? solveTask(TaskModel task) {
     field: task.field,
     start: task.start,
     end: task.end,
-    steps: expandFullPath(path)
-        .map((p) => PointModel(x: p.x, y: p.y))
-        .toList(),
+    steps: expandFullPath(path).map((p) => PointModel(x: p.x, y: p.y)).toList(),
   );
 }
