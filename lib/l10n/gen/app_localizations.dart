@@ -177,6 +177,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No results available.'**
   String get emptyResultsMessage;
+
+  /// Title of the Preview screen app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Preview screen'**
+  String get previewScreenTitle;
+
+  /// Number of steps in the solved path shown under the grid on the Preview screen
+  ///
+  /// In en, this message translates to:
+  /// **'Path length: {length}'**
+  String previewPathLengthLabel(int length);
 }
 
 class _AppLocalizationsDelegate

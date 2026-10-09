@@ -1,0 +1,196 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webspark_task/components/preview/view/preview_view.dart';
+import 'package:webspark_task/components/preview/widget/grid_cell.dart';
+import 'package:webspark_task/l10n/l10n.dart';
+import 'package:webspark_task/shared/di/injection.dart';
+import 'package:webspark_task/shared/models/point_model.dart';
+import 'package:webspark_task/shared/models/solved_model.dart';
+import 'package:webspark_task/shared/navigation/app_router.dart';
+
+/// 3x3 field with one blocked cell and a path along the main diagonal.
+const _field = <String>['...', '.X.', '...'];
+
+final _solved = SolvedModel(
+  id: 'preview-test',
+  field: _field,
+  start: const PointModel(x: 0, y: 0),
+  end: const PointModel(x: 2, y: 2),
+  steps: const <PointModel>[
+    PointModel(x: 0, y: 0),
+    PointModel(x: 2, y: 2),
+  ],
+);
+
+Future<void> _pump(WidgetTester tester, SolvedModel solved) async {
+  await tester.pumpWidget(
+    ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      builder: (context, child) => MaterialApp(
+        locale: defaultLocale,
+        localizationsDelegates: localizationsDelegates,
+        supportedLocales: supportedLocales,
+        home: child,
+      ),
+      child: PreviewView(solved: solved),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Builds a private router over the shared [appRoutes] list so each test
+/// navigates on a clean stack and never leaks `extra` to the next one.
+GoRouter _newRouter() => GoRouter(
+  initialLocation: KRoute.home.path,
+  routes: appRoutes,
+);
+
+/// Mounts [router] so `/preview` is exercised end to end.
+Future<void> _pumpRouter(WidgetTester tester, GoRouter router) async {
+  await tester.pumpWidget(
+    ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      builder: (context, child) => MaterialApp.router(
+        locale: defaultLocale,
+        localizationsDelegates: localizationsDelegates,
+        supportedLocales: supportedLocales,
+        routerConfig: router,
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await configureDependencies();
+  });
+
+  testWidgets('renders one square cell per field position', (tester) async {
+    await _pump(tester, _solved);
+
+    expect(find.byType(GridCell), findsNWidgets(_field.length * _field.length));
+  });
+
+  testWidgets('every cell shows its (x,y) coordinates', (tester) async {
+    await _pump(tester, _solved);
+
+    expect(find.text('(0,0)'), findsOneWidget);
+    expect(find.text('(2,2)'), findsOneWidget);
+    expect(find.text('(1,1)'), findsOneWidget);
+  });
+
+  testWidgets('cells stay square', (tester) async {
+    await _pump(tester, _solved);
+
+    final cells = tester.widgetList<GridCell>(find.byType(GridCell)).toList();
+    expect(cells, isNotEmpty);
+
+    for (final cell in cells) {
+      final box = tester.renderObject<RenderBox>(find.byWidget(cell)).size;
+      expect(box.width, closeTo(box.height, 0.5));
+    }
+  });
+
+  testWidgets('start, end and blocked cells get their own role', (
+    tester,
+  ) async {
+    await _pump(tester, _solved);
+
+    GridCell cellAt(int x, int y) => tester.widget<GridCell>(
+      find.byKey(ValueKey('cell_${x}_$y')),
+    );
+
+    expect(cellAt(0, 0).role, GridCellRole.start);
+    expect(cellAt(2, 2).role, GridCellRole.end);
+    expect(cellAt(1, 1).role, GridCellRole.locked);
+    expect(cellAt(0, 1).role, GridCellRole.empty);
+  });
+
+  testWidgets('path label is written under the grid with spaced arrows', (
+    tester,
+  ) async {
+    await _pump(tester, _solved);
+
+    expect(find.text('(0,0) -> (2,2)'), findsOneWidget);
+  });
+
+  testWidgets('empty path falls back to the empty message', (tester) async {
+    await _pump(tester, _solved.copyWith(steps: const <PointModel>[]));
+
+    expect(find.text('No results available.'), findsOneWidget);
+  });
+
+  testWidgets('layout survives a 1.2 text scale', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(320, 640));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(textScaler: TextScaler.linear(1.2)),
+        child: ScreenUtilInit(
+          designSize: const Size(375, 812),
+          minTextAdapt: true,
+          builder: (context, child) => MaterialApp(
+            locale: defaultLocale,
+            localizationsDelegates: localizationsDelegates,
+            supportedLocales: supportedLocales,
+            home: child,
+          ),
+          child: PreviewView(
+            solved: _solved.copyWith(
+              field: const <String>[
+                '.....',
+                '.....',
+                '.....',
+                '.....',
+                '.....',
+              ],
+              start: const PointModel(x: 0, y: 0),
+              end: const PointModel(x: 4, y: 4),
+              steps: const <PointModel>[PointModel(x: 0, y: 0)],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(GridCell), findsWidgets);
+  });
+
+  testWidgets('preview route renders the model passed as extra', (
+    tester,
+  ) async {
+    final testRouter = _newRouter();
+    await _pumpRouter(tester, testRouter);
+
+    testRouter.goNamed(KRoute.preview.name, extra: _solved);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PreviewView), findsOneWidget);
+    expect(find.text('Preview screen'), findsOneWidget);
+    expect(find.byType(GridCell), findsNWidgets(_field.length * _field.length));
+    expect(find.text('(0,0) -> (2,2)'), findsOneWidget);
+  });
+
+  testWidgets('preview route falls back to mocks without extra', (
+    tester,
+  ) async {
+    final testRouter = _newRouter();
+    await _pumpRouter(tester, testRouter);
+
+    testRouter.goNamed(KRoute.preview.name);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PreviewView), findsOneWidget);
+    expect(find.byType(GridCell), findsNWidgets(16));
+  });
+}
