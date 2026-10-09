@@ -18,6 +18,7 @@ class ProcessBody extends StatelessWidget {
           previous.isFetching != current.isFetching ||
           previous.isCalculating != current.isCalculating ||
           previous.isSubmitting != current.isSubmitting ||
+          previous.isReady != current.isReady ||
           previous.progress != current.progress ||
           previous.failure != current.failure,
       builder: (context, state) {
@@ -25,62 +26,61 @@ class ProcessBody extends StatelessWidget {
             ? l10n.calculationsFinished
             : l10n.calculationsInProgress;
 
-        return SingleChildScrollView(
-          padding: AppInsets.homeBody,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                header,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: AppSizes.bodyFontSize.sp),
-              ),
-              SizedBox(height: 12.h),
-              TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 300),
-                tween: Tween<double>(begin: 0, end: state.progress.toDouble()),
-                builder: (context, value, child) {
-                  if (state.isSubmitting) {
-                    return Center(
-                      child: Text(
-                        l10n.sendingResults,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: AppSizes.inputFontSize.sp),
+        // Centre the block while it fits, but keep it scrollable on small
+        // screens so a larger text scale never overflows the body.
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: AppInsets.homeBody,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      header,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: AppSizes.bodyFontSize.sp),
+                    ),
+                    SizedBox(height: 12.h),
+                    // The real progress is rendered directly. The previous
+                    // TweenAnimationBuilder(begin: 0, end: progress) restarted
+                    // from 0 on every update, making the number jump back.
+                    Text(
+                      '${state.progress}%',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: AppSizes.inputFontSize.sp,
+                        fontWeight: FontWeight.w600,
                       ),
-                    );
-                  }
-
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${value.toInt()}%',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: AppSizes.inputFontSize.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: Colors.grey.shade400,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey.shade400,
-                        ),
+                    ),
+                    // Determinate ring while calculating, an indeterminate
+                    // spinner while sending. Same widget in the same slot, so
+                    // nothing shifts when the state flips.
+                    Center(
+                      child: AppLoader(
+                        size: 100,
+                        value: state.isSubmitting ? null : state.progress / 100,
                       ),
-                      AppLoader(size: 100, value: value / 100),
+                    ),
+                    if (state.failure != null) ...[
+                      SizedBox(height: 12.h),
+                      ErrorBanner(failure: state.failure!),
                     ],
-                  );
-                },
+                  ],
+                ),
               ),
-              if (state.failure != null) ...[
-                SizedBox(height: 12.h),
-                ErrorBanner(failure: state.failure!),
-              ],
-              SizedBox(height: 12.h),
-            ],
-          ),
+            );
+          },
         );
       },
     );

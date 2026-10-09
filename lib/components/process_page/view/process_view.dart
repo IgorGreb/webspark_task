@@ -24,7 +24,13 @@ class ProcessView extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: CustomAppBar(title: l10n.processScreenTitle),
+        appBar: CustomAppBar(
+          title: l10n.processScreenTitle,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.goNamed(KRoute.home.name),
+          ),
+        ),
         body: const ProcessBody(),
         bottomNavigationBar: SafeArea(
           minimum: AppInsets.bottomBarSafeArea,
