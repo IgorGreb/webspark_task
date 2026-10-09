@@ -10,6 +10,8 @@ import 'package:webspark_task/shared/repositories/i_path_repository.dart';
 
 const int _statusOk = 200;
 
+const Duration _requestTimeout = Duration(seconds: 15);
+
 @LazySingleton(as: IPathRepository)
 class PathRepository implements IPathRepository {
   PathRepository(this._client);
@@ -21,7 +23,7 @@ class PathRepository implements IPathRepository {
     return eitherFutureHelper(
       () async {
         final uri = Uri.parse(baseUrl.trim());
-        final response = await _client.get(uri);
+        final response = await _client.get(uri).timeout(_requestTimeout);
 
         if (response.statusCode != _statusOk) {
           return Left(failureFromStatusCode(response.statusCode));

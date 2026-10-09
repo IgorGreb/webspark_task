@@ -30,20 +30,28 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
     ProcessStarted event,
     Emitter<ProcessState> emit,
   ) async {
+    // Guard against double-tap on Try Again while a fetch/compute is running.
+    if (state.isFetching || state.isCalculating) return;
     emit(const ProcessState(isFetching: true));
 
-    final savedUrl = _urlRepository.getUrl().fold((_) => null, (url) => url);
-    if (savedUrl == null || savedUrl.isEmpty) {
-      emit(const ProcessState(failure: SomeFailure.invalidUrl));
-      return;
-    }
-
-    final tasksResult = await _pathRepository.fetchTasks(savedUrl);
-
-    final tasks = tasksResult.fold((_) => null, (tasks) => tasks);
+    // Tasks preloaded by Home (passed via `extra`) skip the second fetch,
+    // so the server is hit only once. Direct entry / retry fetches as before.
+    final preloaded = event.tasks;
+    List<TaskModel>? tasks = preloaded;
     if (tasks == null) {
-      emit(ProcessState(failure: _failureOf(tasksResult)));
-      return;
+      final savedUrl = _urlRepository.getUrl().fold((_) => null, (url) => url);
+      if (savedUrl == null || savedUrl.isEmpty) {
+        emit(const ProcessState(failure: SomeFailure.invalidUrl));
+        return;
+      }
+
+      final tasksResult = await _pathRepository.fetchTasks(savedUrl);
+
+      tasks = tasksResult.fold((_) => null, (tasks) => tasks);
+      if (tasks == null) {
+        emit(ProcessState(failure: _failureOf(tasksResult)));
+        return;
+      }
     }
 
     emit(ProcessState(total: tasks.length, isCalculating: true));

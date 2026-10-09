@@ -195,6 +195,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Path length: {length}'**
   String previewPathLengthLabel(int length);
+
+  /// Label of the button retrying the failed request
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
+
+  /// Error shown for an invalid API base URL
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid URL. Please enter a valid API base URL.'**
+  String get invalidUrlFailure;
+
+  /// Error shown when there is no internet connection
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Check your connection and try again.'**
+  String get networkFailure;
+
+  /// Error shown on server-side failure
+  ///
+  /// In en, this message translates to:
+  /// **'Server error. Please try again later.'**
+  String get serverErrorFailure;
+
+  /// Error shown on HTTP 429
+  ///
+  /// In en, this message translates to:
+  /// **'Too many requests. Please wait and try again.'**
+  String get tooManyRequestsFailure;
+
+  /// Error shown on HTTP 404
+  ///
+  /// In en, this message translates to:
+  /// **'Data not found.'**
+  String get dataNotFoundFailure;
+
+  /// Error shown on malformed server response
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid response format.'**
+  String get formatFailure;
+
+  /// Error shown on request timeout
+  ///
+  /// In en, this message translates to:
+  /// **'Request timed out. Please try again.'**
+  String get timeoutFailure;
+
+  /// Error shown on cancelled request
+  ///
+  /// In en, this message translates to:
+  /// **'Request was cancelled.'**
+  String get cancelledFailure;
+
+  /// Error shown on HTTP 401/403
+  ///
+  /// In en, this message translates to:
+  /// **'Unauthorized request.'**
+  String get unauthorizedFailure;
+
+  /// Generic fallback error message
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get unknownFailure;
 }
 
 class _AppLocalizationsDelegate

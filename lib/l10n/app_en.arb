@@ -72,5 +72,49 @@
         "type": "int"
       }
     }
+  },
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Label of the button retrying the failed request"
+  },
+  "invalidUrlFailure": "Invalid URL. Please enter a valid API base URL.",
+  "@invalidUrlFailure": {
+    "description": "Error shown for an invalid API base URL"
+  },
+  "networkFailure": "Network error. Check your connection and try again.",
+  "@networkFailure": {
+    "description": "Error shown when there is no internet connection"
+  },
+  "serverErrorFailure": "Server error. Please try again later.",
+  "@serverErrorFailure": {
+    "description": "Error shown on server-side failure"
+  },
+  "tooManyRequestsFailure": "Too many requests. Please wait and try again.",
+  "@tooManyRequestsFailure": {
+    "description": "Error shown on HTTP 429"
+  },
+  "dataNotFoundFailure": "Data not found.",
+  "@dataNotFoundFailure": {
+    "description": "Error shown on HTTP 404"
+  },
+  "formatFailure": "Invalid response format.",
+  "@formatFailure": {
+    "description": "Error shown on malformed server response"
+  },
+  "timeoutFailure": "Request timed out. Please try again.",
+  "@timeoutFailure": {
+    "description": "Error shown on request timeout"
+  },
+  "cancelledFailure": "Request was cancelled.",
+  "@cancelledFailure": {
+    "description": "Error shown on cancelled request"
+  },
+  "unauthorizedFailure": "Unauthorized request.",
+  "@unauthorizedFailure": {
+    "description": "Error shown on HTTP 401/403"
+  },
+  "unknownFailure": "Something went wrong. Please try again.",
+  "@unknownFailure": {
+    "description": "Generic fallback error message"
   }
 }

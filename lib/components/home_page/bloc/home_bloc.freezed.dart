@@ -272,7 +272,7 @@ String toString() {
 /// @nodoc
 mixin _$HomeState {
 
- String get url; bool get isValid; SomeFailure? get failure; HomeStatus get status;
+ String get url; bool get isValid; SomeFailure? get failure; HomeStatus get status; List<TaskModel>? get tasks;
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -283,16 +283,16 @@ $HomeStateCopyWith<HomeState> get copyWith => _$HomeStateCopyWithImpl<HomeState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.url, url) || other.url == url)&&(identical(other.isValid, isValid) || other.isValid == isValid)&&(identical(other.failure, failure) || other.failure == failure)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.url, url) || other.url == url)&&(identical(other.isValid, isValid) || other.isValid == isValid)&&(identical(other.failure, failure) || other.failure == failure)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.tasks, tasks));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,url,isValid,failure,status);
+int get hashCode => Object.hash(runtimeType,url,isValid,failure,status,const DeepCollectionEquality().hash(tasks));
 
 @override
 String toString() {
-  return 'HomeState(url: $url, isValid: $isValid, failure: $failure, status: $status)';
+  return 'HomeState(url: $url, isValid: $isValid, failure: $failure, status: $status, tasks: $tasks)';
 }
 
 
@@ -303,7 +303,7 @@ abstract mixin class $HomeStateCopyWith<$Res>  {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) _then) = _$HomeStateCopyWithImpl;
 @useResult
 $Res call({
- String url, bool isValid, SomeFailure? failure, HomeStatus status
+ String url, bool isValid, SomeFailure? failure, HomeStatus status, List<TaskModel>? tasks
 });
 
 
@@ -320,13 +320,14 @@ class _$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? url = null,Object? isValid = null,Object? failure = freezed,Object? status = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? url = null,Object? isValid = null,Object? failure = freezed,Object? status = null,Object? tasks = freezed,}) {
   return _then(_self.copyWith(
 url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,isValid: null == isValid ? _self.isValid : isValid // ignore: cast_nullable_to_non_nullable
 as bool,failure: freezed == failure ? _self.failure : failure // ignore: cast_nullable_to_non_nullable
 as SomeFailure?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as HomeStatus,
+as HomeStatus,tasks: freezed == tasks ? _self.tasks : tasks // ignore: cast_nullable_to_non_nullable
+as List<TaskModel>?,
   ));
 }
 
@@ -408,10 +409,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String url,  bool isValid,  SomeFailure? failure,  HomeStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String url,  bool isValid,  SomeFailure? failure,  HomeStatus status,  List<TaskModel>? tasks)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.url,_that.isValid,_that.failure,_that.status);case _:
+return $default(_that.url,_that.isValid,_that.failure,_that.status,_that.tasks);case _:
   return orElse();
 
 }
@@ -429,10 +430,10 @@ return $default(_that.url,_that.isValid,_that.failure,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String url,  bool isValid,  SomeFailure? failure,  HomeStatus status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String url,  bool isValid,  SomeFailure? failure,  HomeStatus status,  List<TaskModel>? tasks)  $default,) {final _that = this;
 switch (_that) {
 case _HomeState():
-return $default(_that.url,_that.isValid,_that.failure,_that.status);}
+return $default(_that.url,_that.isValid,_that.failure,_that.status,_that.tasks);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -446,10 +447,10 @@ return $default(_that.url,_that.isValid,_that.failure,_that.status);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String url,  bool isValid,  SomeFailure? failure,  HomeStatus status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String url,  bool isValid,  SomeFailure? failure,  HomeStatus status,  List<TaskModel>? tasks)?  $default,) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.url,_that.isValid,_that.failure,_that.status);case _:
+return $default(_that.url,_that.isValid,_that.failure,_that.status,_that.tasks);case _:
   return null;
 
 }
@@ -461,13 +462,22 @@ return $default(_that.url,_that.isValid,_that.failure,_that.status);case _:
 
 
 class _HomeState implements HomeState {
-  const _HomeState({this.url = '', this.isValid = false, this.failure, this.status = HomeStatus.initial});
+  const _HomeState({this.url = '', this.isValid = false, this.failure, this.status = HomeStatus.initial, final  List<TaskModel>? tasks = null}): _tasks = tasks;
   
 
 @override@JsonKey() final  String url;
 @override@JsonKey() final  bool isValid;
 @override final  SomeFailure? failure;
 @override@JsonKey() final  HomeStatus status;
+ final  List<TaskModel>? _tasks;
+@override@JsonKey() List<TaskModel>? get tasks {
+  final value = _tasks;
+  if (value == null) return null;
+  if (_tasks is EqualUnmodifiableListView) return _tasks;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
@@ -479,16 +489,16 @@ _$HomeStateCopyWith<_HomeState> get copyWith => __$HomeStateCopyWithImpl<_HomeSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.url, url) || other.url == url)&&(identical(other.isValid, isValid) || other.isValid == isValid)&&(identical(other.failure, failure) || other.failure == failure)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.url, url) || other.url == url)&&(identical(other.isValid, isValid) || other.isValid == isValid)&&(identical(other.failure, failure) || other.failure == failure)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._tasks, _tasks));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,url,isValid,failure,status);
+int get hashCode => Object.hash(runtimeType,url,isValid,failure,status,const DeepCollectionEquality().hash(_tasks));
 
 @override
 String toString() {
-  return 'HomeState(url: $url, isValid: $isValid, failure: $failure, status: $status)';
+  return 'HomeState(url: $url, isValid: $isValid, failure: $failure, status: $status, tasks: $tasks)';
 }
 
 
@@ -499,7 +509,7 @@ abstract mixin class _$HomeStateCopyWith<$Res> implements $HomeStateCopyWith<$Re
   factory _$HomeStateCopyWith(_HomeState value, $Res Function(_HomeState) _then) = __$HomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- String url, bool isValid, SomeFailure? failure, HomeStatus status
+ String url, bool isValid, SomeFailure? failure, HomeStatus status, List<TaskModel>? tasks
 });
 
 
@@ -516,13 +526,14 @@ class __$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? url = null,Object? isValid = null,Object? failure = freezed,Object? status = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? url = null,Object? isValid = null,Object? failure = freezed,Object? status = null,Object? tasks = freezed,}) {
   return _then(_HomeState(
 url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,isValid: null == isValid ? _self.isValid : isValid // ignore: cast_nullable_to_non_nullable
 as bool,failure: freezed == failure ? _self.failure : failure // ignore: cast_nullable_to_non_nullable
 as SomeFailure?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as HomeStatus,
+as HomeStatus,tasks: freezed == tasks ? _self._tasks : tasks // ignore: cast_nullable_to_non_nullable
+as List<TaskModel>?,
   ));
 }
 

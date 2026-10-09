@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'package:webspark_task/shared/models/failure_model/some_failure.dart';
@@ -9,15 +12,15 @@ Future<Either<SomeFailure, T>> eitherFutureHelper<T>(
 }) async {
   try {
     return await function();
+  } on SocketException {
+    return const Left(SomeFailure.network);
+  } on TimeoutException {
+    return const Left(SomeFailure.timeout);
   } on http.ClientException {
     return const Left(SomeFailure.network);
   } on FormatException {
     return const Left(SomeFailure.format);
-  } catch (e) {
-    if (e.toString().contains('SocketException') ||
-        e.toString().contains('Connection')) {
-      return const Left(SomeFailure.network);
-    }
+  } catch (_) {
     return const Left(SomeFailure.unknown);
   }
 }

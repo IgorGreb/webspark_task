@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webspark_task/shared/models/solved_model.dart';
+import 'package:webspark_task/shared/models/task_model.dart';
 import 'package:webspark_task/components/result_list/view/result_list_view.dart';
 import 'package:webspark_task/components/home_page/widget/bloc_provider/home_bloc_provider.dart';
 import 'package:webspark_task/components/not_found/view/not_found_view.dart';
@@ -27,8 +28,10 @@ final List<RouteBase> appRoutes = <RouteBase>[
   GoRoute(
     name: KRoute.process.name,
     path: KRoute.process.path,
-    pageBuilder: (context, state) =>
-        const NoTransitionPage(child: ProcessBlocProvider()),
+    pageBuilder: (context, state) {
+      final tasks = state.extra as List<TaskModel>?;
+      return NoTransitionPage(child: ProcessBlocProvider(tasks: tasks));
+    },
   ),
   GoRoute(
     name: KRoute.results.name,

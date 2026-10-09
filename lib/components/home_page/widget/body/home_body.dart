@@ -5,6 +5,8 @@ import 'package:webspark_task/components/home_page/bloc/home_bloc.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
 import 'package:webspark_task/shared/constants/theme/app_colors.dart';
+import 'package:webspark_task/shared/models/failure_model/some_failure.dart';
+import 'package:webspark_task/shared/widget/try_again_widget.dart';
 
 class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
@@ -106,24 +108,42 @@ class _HomeBodyState extends State<HomeBody> {
               ],
             ),
             SizedBox(height: 8.h),
-            SizedBox(
-              height: 20.h,
-              child: BlocBuilder<HomeBloc, HomeState>(
-                buildWhen: (previous, current) =>
-                    previous.failure != current.failure,
-                builder: (context, state) {
-                  final errorMessage = state.failure?.message;
-                  if (errorMessage == null) {
-                    return const SizedBox.shrink();
-                  }
-                  return Text(
-                    errorMessage,
-                    style: errorTextStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            BlocBuilder<HomeBloc, HomeState>(
+              buildWhen: (previous, current) =>
+                  previous.failure != current.failure ||
+                  previous.status != current.status,
+              builder: (context, state) {
+                final failure = state.failure;
+                if (failure == null) {
+                  return const SizedBox.shrink();
+                }
+                // Field-format error (invalid URL) stays a compact one-liner
+                // under the input, like before.
+                if (state.status == HomeStatus.failure &&
+                    state.tasks == null &&
+                    failure == SomeFailure.invalidUrl) {
+                  return SizedBox(
+                    height: 20.h,
+                    child: Text(
+                      failure.message,
+                      style: errorTextStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   );
-                },
-              ),
+                }
+                // Server/network failure after submit: full Try Again that
+                // re-dispatches submit, staying on Home (no navigation).
+                if (state.status == HomeStatus.failure) {
+                  return TryAgainWidget(
+                    failure: failure,
+                    onPressed: () => context.read<HomeBloc>().add(
+                      const HomeEvent.submitted(),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
           ],
         ),

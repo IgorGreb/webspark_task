@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import 'package:webspark_task/l10n/l10n.dart';
+
 enum SomeFailure {
   invalidUrl,
   network,
@@ -32,6 +35,33 @@ enum SomeFailure {
         return 'Unauthorized request.';
       case SomeFailure.unknown:
         return 'Something went wrong. Please try again.';
+    }
+  }
+
+  String localizedMessage(BuildContext? context) {
+    final l10n = context?.maybeL10n;
+    if (l10n == null) return message;
+    switch (this) {
+      case SomeFailure.invalidUrl:
+        return l10n.invalidUrlFailure;
+      case SomeFailure.network:
+        return l10n.networkFailure;
+      case SomeFailure.serverError:
+        return l10n.serverErrorFailure;
+      case SomeFailure.tooManyRequests:
+        return l10n.tooManyRequestsFailure;
+      case SomeFailure.dataNotFound:
+        return l10n.dataNotFoundFailure;
+      case SomeFailure.format:
+        return l10n.formatFailure;
+      case SomeFailure.timeout:
+        return l10n.timeoutFailure;
+      case SomeFailure.cancelled:
+        return l10n.cancelledFailure;
+      case SomeFailure.unauthorized:
+        return l10n.unauthorizedFailure;
+      case SomeFailure.unknown:
+        return l10n.unknownFailure;
     }
   }
 }
