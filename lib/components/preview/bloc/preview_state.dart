@@ -18,10 +18,11 @@ abstract class PreviewState with _$PreviewState {
   /// Number of steps in the solved path.
   int get stepCount => solved?.steps.length ?? 0;
 
-  /// Human readable path with spaces around the arrows: `(0,0) -> (1,1)`.
+  /// Human readable path, arrows without spaces: `(0,0)->(1,1)`.
+  /// Kept identical to the Result list label and the API path format.
   String get pathLabel => solved == null
       ? ''
-      : solved!.steps.map((p) => '(${p.x},${p.y})').join(' -> ');
+      : solved!.steps.map((p) => '(${p.x},${p.y})').join('->');
 
   /// Maps a cell of the field onto its visual role so the grid can pick the
   /// matching colour from [GridCellRole].

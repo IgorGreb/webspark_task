@@ -116,12 +116,10 @@ void main() {
     expect(cellAt(0, 1).role, GridCellRole.empty);
   });
 
-  testWidgets('path label is written under the grid with spaced arrows', (
-    tester,
-  ) async {
+  testWidgets('path label is written under the grid', (tester) async {
     await _pump(tester, _solved);
 
-    expect(find.text('(0,0) -> (2,2)'), findsOneWidget);
+    expect(find.text('(0,0)->(2,2)'), findsOneWidget);
   });
 
   testWidgets('empty path falls back to the empty message', (tester) async {
@@ -198,7 +196,7 @@ void main() {
     expect(find.byType(PreviewView), findsOneWidget);
     expect(find.text('Preview screen'), findsOneWidget);
     expect(find.byType(GridCell), findsNWidgets(_field.length * _field.length));
-    expect(find.text('(0,0) -> (2,2)'), findsOneWidget);
+    expect(find.text('(0,0)->(2,2)'), findsOneWidget);
   });
 
   testWidgets('preview route shows empty state when no extra is passed', (
