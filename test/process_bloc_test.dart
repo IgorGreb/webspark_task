@@ -196,4 +196,51 @@ void main() {
     expect(ready.results.first.id, 'solvable');
     await bloc.close();
   });
+
+  test('retry after fetch failure restarts and succeeds', () async {
+    final path = FakePathRepository(
+      tasks: [_task('a')],
+      fetchFailure: SomeFailure.network,
+    );
+    final bloc = ProcessBloc(FakeUrlRepository(url: _validUrl), path)
+      ..add(const ProcessEvent.started());
+
+    final failed = await bloc.stream.firstWhere((s) => s.failure != null);
+    expect(failed.failure, SomeFailure.network);
+    expect(failed.isReady, isFalse);
+
+    // Simulate Try Again: failure clears, fetch succeeds.
+    path.fetchFailure = null;
+    bloc.add(const ProcessEvent.started());
+    final ready = await bloc.stream.firstWhere((s) => s.isReady);
+
+    expect(ready.failure, isNull);
+    expect(ready.total, 1);
+    expect(ready.results, hasLength(1));
+    await bloc.close();
+  });
+
+  test('retry after submit failure re-submits and succeeds', () async {
+    final path = FakePathRepository(
+      tasks: [_task('a')],
+      submitFailure: SomeFailure.serverError,
+    );
+    final bloc = ProcessBloc(FakeUrlRepository(url: _validUrl), path);
+    bloc.add(const ProcessEvent.started());
+    await bloc.stream.firstWhere((s) => s.isReady);
+
+    bloc.add(const ProcessEvent.submitted());
+    final failed = await bloc.stream.firstWhere((s) => s.failure != null);
+    expect(failed.failure, SomeFailure.serverError);
+    expect(failed.isReady, isTrue);
+
+    // Simulate Try Again on submit: failure clears, submit succeeds.
+    path.submitFailure = null;
+    bloc.add(const ProcessEvent.submitted());
+    final done = await bloc.stream.firstWhere((s) => s.isSubmitted);
+
+    expect(done.failure, isNull);
+    expect(path.lastSubmitted, hasLength(1));
+    await bloc.close();
+  });
 }

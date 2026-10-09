@@ -6,7 +6,7 @@ import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
 import 'package:webspark_task/shared/constants/theme/app_colors.dart';
 import 'package:webspark_task/shared/widget/app_loader.dart';
-import 'package:webspark_task/shared/widget/error_banner.dart';
+import 'package:webspark_task/shared/widget/try_again_widget.dart';
 
 class ProcessBody extends StatelessWidget {
   const ProcessBody({super.key});
@@ -26,6 +26,8 @@ class ProcessBody extends StatelessWidget {
         final header = state.isReady
             ? l10n.calculationsFinished
             : l10n.calculationsInProgress;
+  
+        final isBusy = state.isFetching || state.isSubmitting;
 
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -62,12 +64,22 @@ class ProcessBody extends StatelessWidget {
                     Center(
                       child: AppLoader(
                         size: 100,
-                        value: state.isSubmitting ? null : state.progress / 100,
+                        value: isBusy ? null : state.progress / 100,
                       ),
                     ),
                     if (state.failure != null) ...[
                       SizedBox(height: 12.h),
-                      ErrorBanner(failure: state.failure!),
+                      // Fetch failed (nothing solved yet) -> full retry
+                      // re-dispatches ProcessStarted, like fwipp's TryAgainWidget.
+                      // Submit failed (results kept, isReady) -> retry submit.
+                      TryAgainWidget(
+                        failure: state.failure,
+                        onPressed: () => context.read<ProcessBloc>().add(
+                          state.isReady
+                              ? const ProcessEvent.submitted()
+                              : const ProcessEvent.started(),
+                        ),
+                      ),
                     ],
                   ],
                 ),

@@ -61,4 +61,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String previewPathLengthLabel(int length) {
     return 'Path length: $length';
   }
+
+  @override
+  String get tryAgain => 'Try Again';
+
+  @override
+  String get invalidUrlFailure =>
+      'Invalid URL. Please enter a valid API base URL.';
+
+  @override
+  String get networkFailure =>
+      'Network error. Check your connection and try again.';
+
+  @override
+  String get serverErrorFailure => 'Server error. Please try again later.';
+
+  @override
+  String get tooManyRequestsFailure =>
+      'Too many requests. Please wait and try again.';
+
+  @override
+  String get dataNotFoundFailure => 'Data not found.';
+
+  @override
+  String get formatFailure => 'Invalid response format.';
+
+  @override
+  String get timeoutFailure => 'Request timed out. Please try again.';
+
+  @override
+  String get cancelledFailure => 'Request was cancelled.';
+
+  @override
+  String get unauthorizedFailure => 'Unauthorized request.';
+
+  @override
+  String get unknownFailure => 'Something went wrong. Please try again.';
 }

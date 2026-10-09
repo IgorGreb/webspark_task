@@ -30,6 +30,7 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
     ProcessStarted event,
     Emitter<ProcessState> emit,
   ) async {
+    if (state.isFetching || state.isCalculating) return;
     emit(const ProcessState(isFetching: true));
 
     final savedUrl = _urlRepository.getUrl().fold((_) => null, (url) => url);
