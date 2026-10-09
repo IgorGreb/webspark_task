@@ -6,7 +6,6 @@ import 'package:webspark_task/components/result_list/view/result_list_view.dart'
 import 'package:webspark_task/components/home_page/widget/bloc_provider/home_bloc_provider.dart';
 import 'package:webspark_task/components/not_found/view/not_found_view.dart';
 import 'package:webspark_task/components/preview/widget/bloc_provider/preview_bloc_provider.dart';
-import 'package:webspark_task/components/preview/widget/preview_mocks.dart';
 import 'package:webspark_task/components/process_page/widget/bloc_provider/process_bloc_provider.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -45,7 +44,7 @@ final List<RouteBase> appRoutes = <RouteBase>[
     name: KRoute.preview.name,
     path: KRoute.preview.path,
     pageBuilder: (context, state) {
-      final solved = state.extra as SolvedModel? ?? PreviewMocks.solved;
+      final solved = state.extra as SolvedModel?;
       return NoTransitionPage(child: PreviewBlocProvider(solved: solved));
     },
   ),

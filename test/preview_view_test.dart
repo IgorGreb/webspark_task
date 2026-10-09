@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webspark_task/components/preview/view/preview_view.dart';
+import 'package:webspark_task/components/not_found/view/not_found_view.dart';
 import 'package:webspark_task/components/preview/widget/bloc_provider/preview_bloc_provider.dart';
 import 'package:webspark_task/components/preview/widget/grid_cell.dart';
 import 'package:webspark_task/l10n/l10n.dart';
@@ -42,8 +44,15 @@ Future<void> _pump(WidgetTester tester, SolvedModel solved) async {
   await tester.pumpAndSettle();
 }
 
-/// Mounts the real app router so `/preview` is exercised end to end.
-Future<void> _pumpRouter(WidgetTester tester) async {
+/// Mounts the real app routes on a fresh, isolated router so `/preview` is
+/// exercised end to end. A local [GoRouter] (instead of the global singleton)
+/// keeps each test's navigation `extra` from leaking into the next one.
+Future<GoRouter> _pumpRouter(WidgetTester tester) async {
+  final router = GoRouter(
+    initialLocation: KRoute.home.path,
+    errorBuilder: (context, state) => const NotFoundView(),
+    routes: appRoutes,
+  );
   await tester.pumpWidget(
     ScreenUtilInit(
       designSize: const Size(375, 812),
@@ -57,6 +66,7 @@ Future<void> _pumpRouter(WidgetTester tester) async {
     ),
   );
   await tester.pumpAndSettle();
+  return router;
 }
 
 void main() {
@@ -180,9 +190,7 @@ void main() {
   testWidgets('preview route renders the model passed as extra', (
     tester,
   ) async {
-    await _pumpRouter(tester);
-    router.go(KRoute.home.path);
-    await tester.pumpAndSettle();
+    final router = await _pumpRouter(tester);
 
     router.goNamed(KRoute.preview.name, extra: _solved);
     await tester.pumpAndSettle();
@@ -191,5 +199,18 @@ void main() {
     expect(find.text('Preview screen'), findsOneWidget);
     expect(find.byType(GridCell), findsNWidgets(_field.length * _field.length));
     expect(find.text('(0,0) -> (2,2)'), findsOneWidget);
+  });
+
+  testWidgets('preview route shows empty state when no extra is passed', (
+    tester,
+  ) async {
+    final router = await _pumpRouter(tester);
+
+    router.goNamed(KRoute.preview.name);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PreviewView), findsOneWidget);
+    expect(find.byType(GridCell), findsNothing);
+    expect(find.text('No task selected.'), findsOneWidget);
   });
 }

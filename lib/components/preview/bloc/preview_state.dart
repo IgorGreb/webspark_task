@@ -9,6 +9,9 @@ abstract class PreviewState with _$PreviewState {
   /// Side of the square field; `0` while no model is loaded yet.
   int get size => solved?.field.length ?? 0;
 
+  /// `true` when there is no model at all (nothing was selected).
+  bool get hasNoModel => solved == null;
+
   /// `true` when there is nothing to draw (no model or an empty path).
   bool get isEmpty => solved == null || solved!.steps.isEmpty;
 

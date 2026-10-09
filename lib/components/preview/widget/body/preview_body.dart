@@ -17,6 +17,23 @@ class PreviewBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
+    // Nothing was passed in: show a clear message instead of an empty grid.
+    if (state.hasNoModel) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.w),
+          child: Text(
+            l10n.previewEmptyMessage,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: AppSizes.bodyFontSize.sp,
+              color: AppColors.lockedCell,
+            ),
+          ),
+        ),
+      );
+    }
+
     return SafeArea(
       child: Padding(
         padding: AppInsets.homeBody,

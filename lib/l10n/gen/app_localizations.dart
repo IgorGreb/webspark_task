@@ -184,6 +184,12 @@ abstract class AppLocalizations {
   /// **'Preview screen'**
   String get previewScreenTitle;
 
+  /// Message shown on the Preview screen when no solved task was passed in
+  ///
+  /// In en, this message translates to:
+  /// **'No task selected.'**
+  String get previewEmptyMessage;
+
   /// Number of steps in the solved path shown under the grid on the Preview screen
   ///
   /// In en, this message translates to:
