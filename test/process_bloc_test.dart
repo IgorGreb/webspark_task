@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:webspark_task/components/process_page/bloc/process_bloc.dart';
@@ -76,18 +78,30 @@ class FakePathRepository implements IPathRepository {
 void main() {
   test('solving progresses through solved count and finishes ready', () async {
     final path = FakePathRepository(tasks: [_task('a'), _task('b')]);
-    final bloc = ProcessBloc(FakeUrlRepository(url: _validUrl), path)
-      ..add(const ProcessEvent.started());
+    final bloc = ProcessBloc(FakeUrlRepository(url: _validUrl), path);
 
-    final states = await bloc.stream.toList();
+    // Collect every emitted state, but stop as soon as the bloc reports ready.
+    // `stream.toList()` can't be used here: it only completes when the stream
+    // is closed, which happens on `close()` below -> circular wait / timeout.
+    final states = <ProcessState>[];
+    final ready = Completer<void>();
+    final subscription = bloc.stream.listen((state) {
+      states.add(state);
+      if (state.isReady && !ready.isCompleted) ready.complete();
+    });
+
+    bloc.add(const ProcessEvent.started());
+    await ready.future;
+    await subscription.cancel();
 
     expect(states.first.isFetching, isTrue);
-    final ready = states.last;
-    expect(ready.total, 2);
-    expect(ready.solved, 2);
-    expect(ready.progress, 100);
-    expect(ready.isReady, isTrue);
-    expect(ready.results, hasLength(2));
+    expect(states.any((s) => s.isCalculating), isTrue);
+    final done = states.last;
+    expect(done.total, 2);
+    expect(done.solved, 2);
+    expect(done.progress, 100);
+    expect(done.isReady, isTrue);
+    expect(done.results, hasLength(2));
     await bloc.close();
   });
 
