@@ -23,11 +23,7 @@ class ResultListBody extends StatelessWidget {
     }
     return ListView.builder(
       itemCount: results.length,
-      itemBuilder: (context, index) {
-        final result = results[index];
-        final pathStr = result.steps.map((p) => '(${p.x},${p.y})').join('->');
-        return ResultRow(pathStr: pathStr);
-      },
+      itemBuilder: (context, index) => ResultRow(solved: results[index]),
     );
   }
 }

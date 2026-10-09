@@ -60,6 +60,10 @@
   "@previewScreenTitle": {
     "description": "Title of the Preview screen app bar"
   },
+  "previewEmptyMessage": "No task selected.",
+  "@previewEmptyMessage": {
+    "description": "Message shown on the Preview screen when no solved task was passed in"
+  },
   "previewPathLengthLabel": "Path length: {length}",
   "@previewPathLengthLabel": {
     "description": "Number of steps in the solved path shown under the grid on the Preview screen",

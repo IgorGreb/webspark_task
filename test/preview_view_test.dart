@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webspark_task/components/preview/view/preview_view.dart';
+import 'package:webspark_task/components/not_found/view/not_found_view.dart';
+import 'package:webspark_task/components/preview/widget/bloc_provider/preview_bloc_provider.dart';
 import 'package:webspark_task/components/preview/widget/grid_cell.dart';
 import 'package:webspark_task/l10n/l10n.dart';
 import 'package:webspark_task/shared/di/injection.dart';
@@ -36,21 +38,21 @@ Future<void> _pump(WidgetTester tester, SolvedModel solved) async {
         supportedLocales: supportedLocales,
         home: child,
       ),
-      child: PreviewView(solved: solved),
+      child: PreviewBlocProvider(solved: solved),
     ),
   );
   await tester.pumpAndSettle();
 }
 
-/// Builds a private router over the shared [appRoutes] list so each test
-/// navigates on a clean stack and never leaks `extra` to the next one.
-GoRouter _newRouter() => GoRouter(
-  initialLocation: KRoute.home.path,
-  routes: appRoutes,
-);
-
-/// Mounts [router] so `/preview` is exercised end to end.
-Future<void> _pumpRouter(WidgetTester tester, GoRouter router) async {
+/// Mounts the real app routes on a fresh, isolated router so `/preview` is
+/// exercised end to end. A local [GoRouter] (instead of the global singleton)
+/// keeps each test's navigation `extra` from leaking into the next one.
+Future<GoRouter> _pumpRouter(WidgetTester tester) async {
+  final router = GoRouter(
+    initialLocation: KRoute.home.path,
+    errorBuilder: (context, state) => const NotFoundView(),
+    routes: appRoutes,
+  );
   await tester.pumpWidget(
     ScreenUtilInit(
       designSize: const Size(375, 812),
@@ -64,6 +66,7 @@ Future<void> _pumpRouter(WidgetTester tester, GoRouter router) async {
     ),
   );
   await tester.pumpAndSettle();
+  return router;
 }
 
 void main() {
@@ -143,7 +146,7 @@ void main() {
             supportedLocales: supportedLocales,
             home: child,
           ),
-          child: PreviewView(
+          child: PreviewBlocProvider(
             solved: _solved.copyWith(
               field: const <String>[
                 '.....',
@@ -166,13 +169,30 @@ void main() {
     expect(find.byType(GridCell), findsWidgets);
   });
 
+  testWidgets('large field becomes zoomable and panable', (tester) async {
+    // 20x20 field: 24 * 20 = 480 far exceeds the ~340px viewport, so the
+    // grid overflows and gets wrapped in an InteractiveViewer.
+    await _pump(
+      tester,
+      _solved.copyWith(
+        field: List<String>.filled(20, '.' * 20),
+        start: const PointModel(x: 0, y: 0),
+        end: const PointModel(x: 19, y: 19),
+        steps: const <PointModel>[PointModel(x: 0, y: 0)],
+      ),
+    );
+
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+    // All 400 cells still exist, ready to be panned/zoomed into.
+    expect(find.byType(GridCell), findsNWidgets(20 * 20));
+  });
+
   testWidgets('preview route renders the model passed as extra', (
     tester,
   ) async {
-    final testRouter = _newRouter();
-    await _pumpRouter(tester, testRouter);
+    final router = await _pumpRouter(tester);
 
-    testRouter.goNamed(KRoute.preview.name, extra: _solved);
+    router.goNamed(KRoute.preview.name, extra: _solved);
     await tester.pumpAndSettle();
 
     expect(find.byType(PreviewView), findsOneWidget);
@@ -181,16 +201,16 @@ void main() {
     expect(find.text('(0,0) -> (2,2)'), findsOneWidget);
   });
 
-  testWidgets('preview route falls back to mocks without extra', (
+  testWidgets('preview route shows empty state when no extra is passed', (
     tester,
   ) async {
-    final testRouter = _newRouter();
-    await _pumpRouter(tester, testRouter);
+    final router = await _pumpRouter(tester);
 
-    testRouter.goNamed(KRoute.preview.name);
+    router.goNamed(KRoute.preview.name);
     await tester.pumpAndSettle();
 
     expect(find.byType(PreviewView), findsOneWidget);
-    expect(find.byType(GridCell), findsNWidgets(16));
+    expect(find.byType(GridCell), findsNothing);
+    expect(find.text('No task selected.'), findsOneWidget);
   });
 }

@@ -16,6 +16,8 @@ import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 import 'package:webspark_task/components/home_page/bloc/home_bloc.dart'
     as _i160;
+import 'package:webspark_task/components/preview/bloc/preview_bloc.dart'
+    as _i904;
 import 'package:webspark_task/components/process_page/bloc/process_bloc.dart'
     as _i517;
 import 'package:webspark_task/shared/di/network_module.dart' as _i145;
@@ -37,6 +39,7 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final storageModule = _$StorageModule();
     final networkModule = _$NetworkModule();
+    gh.factory<_i904.PreviewBloc>(() => _i904.PreviewBloc());
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => storageModule.prefs,
       preResolve: true,

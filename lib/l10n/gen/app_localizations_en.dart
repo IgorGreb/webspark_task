@@ -55,6 +55,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get previewScreenTitle => 'Preview screen';
 
   @override
+  String get previewEmptyMessage => 'No task selected.';
+
+  @override
   String previewPathLengthLabel(int length) {
     return 'Path length: $length';
   }

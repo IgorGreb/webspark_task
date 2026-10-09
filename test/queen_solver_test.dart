@@ -111,6 +111,48 @@ void main() {
     );
   });
 
+  test('solveTask lists every crossed cell, not only queen turns', () {
+    // Blocked centre forces a go-around; the API wants each cell listed.
+    const taskJson = {
+      'id': 'expand-task',
+      'field': ['....', '.XX.', '.XX.', '....'],
+      'start': {'x': 0, 'y': 0},
+      'end': {'x': 3, 'y': 3},
+    };
+    final task = TaskModel.fromJson(taskJson);
+
+    final solved = solveTask(task);
+
+    expect(solved, isNotNull);
+    // Consecutive steps must always be adjacent cells (queen step of 1).
+    final steps = solved!.steps;
+    expect(steps.first, const PointModel(x: 0, y: 0));
+    expect(steps.last, const PointModel(x: 3, y: 3));
+    for (var i = 1; i < steps.length; i++) {
+      final dx = (steps[i].x - steps[i - 1].x).abs();
+      final dy = (steps[i].y - steps[i - 1].y).abs();
+      expect(dx <= 1 && dy <= 1 && (dx + dy) > 0, isTrue);
+    }
+    expect(steps, hasLength(7));
+  });
+
+  test('expandFullPath fills in the cells between queen turns', () {
+    final turns = <Point>[const Point(0, 3), const Point(3, 0)];
+
+    expect(expandFullPath(turns), <Point>[
+      const Point(0, 3),
+      const Point(1, 2),
+      const Point(2, 1),
+      const Point(3, 0),
+    ]);
+  });
+
+  test('expandFullPath keeps a single-cell path untouched', () {
+    expect(expandFullPath(<Point>[const Point(1, 1)]), <Point>[
+      const Point(1, 1),
+    ]);
+  });
+
   test('solveTask returns null for unsolvable task', () {
     const taskJson = {
       'id': 'unsolvable',
