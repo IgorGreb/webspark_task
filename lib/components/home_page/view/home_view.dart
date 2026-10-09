@@ -27,13 +27,14 @@ class HomeView extends StatelessWidget {
         bottomNavigationBar: SafeArea(
           minimum: AppInsets.bottomBarSafeArea,
           child: BlocBuilder<HomeBloc, HomeState>(
-            buildWhen: (previous, current) =>
-                previous.status != current.status ||
-                previous.isValid != current.isValid,
+            buildWhen: (previous, current) => previous.status != current.status,
             builder: (context, state) {
               final isSubmitting = state.status == HomeStatus.submitting;
+              // Always tappable (except while submitting): tapping with an
+              // empty/invalid URL shows the inline error instead of a dead
+              // grey button with no feedback.
               return MainBtn(
-                onPressed: (isSubmitting || !state.isValid)
+                onPressed: isSubmitting
                     ? null
                     : () => context.read<HomeBloc>().add(
                         const HomeEvent.submitted(),
