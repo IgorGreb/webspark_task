@@ -1,20 +1,13 @@
-import 'package:webspark_task/features/mocks/mock_tasks.dart';
-
 /// URL validation + SSRF hardening.
 /// [validate] keeps the UX-level format check (scheme + host).
 /// [isSafeForRequest] additionally blocks non-routable targets
 /// (localhost / LAN / cloud metadata) so the app never fetches them.
-///
-/// `mock://...` URLs are a local debug harness (see `MockTasks` in
-/// `features/mocks/mock_tasks.dart`): they never hit the network, so they
-/// bypass the SSRF block but are only honored by the mock-aware repository
-/// decorator in debug builds.
 abstract class UrlValidator {
   static const int maxUrlLength = 2048;
 
-  /// Schemes allowed for typing into the Home field (`mock` = local harness).
+  /// Schemes allowed for typing into the Home field.
   static bool _isAllowedScheme(String scheme) =>
-      scheme == 'http' || scheme == 'https' || scheme == 'mock';
+      scheme == 'http' || scheme == 'https';
 
   static String? validate(String? value) {
     final trimmed = (value ?? '').trim();
@@ -23,11 +16,6 @@ abstract class UrlValidator {
     final uri = Uri.tryParse(trimmed);
     if (uri == null || !uri.hasScheme) return 'invalid';
     if (!_isAllowedScheme(uri.scheme)) return 'invalid';
-    // mock:// presets carry no host requirement (e.g. `mock://large`).
-    if (uri.scheme == 'mock') {
-      if (uri.userInfo.isNotEmpty) return 'invalid';
-      return null;
-    }
     if (uri.host.isEmpty) return 'invalid';
     // Reject embedded credentials like https://user:pass@host/.
     if (uri.userInfo.isNotEmpty) return 'invalid';
@@ -37,11 +25,9 @@ abstract class UrlValidator {
   static bool isValid(String? value) => validate(value) == null;
 
   /// True when the URL is well-formed AND points at a public host.
-  /// Mock URLs are always "safe": they are served locally, never fetched.
   static bool isSafeForRequest(String? value) {
     final trimmed = (value ?? '').trim();
     if (!isValid(trimmed)) return false;
-    if (MockTasks.isMockUrl(trimmed)) return true;
     final host = Uri.tryParse(trimmed)?.host ?? '';
     return !isBlockedHost(host);
   }
