@@ -21,27 +21,11 @@ enum GridCellRole {
   end,
 }
 
-/// One square cell of the preview grid with its `(x,y)` coordinates inside.
-///
-/// The cell is painted with the matching [AppColors] entry and keeps a 1:1
-/// aspect ratio because the parent grid sizes every child equally.
-class GridCell extends StatelessWidget {
-  const GridCell({
-    super.key,
-    required this.x,
-    required this.y,
-    this.role = GridCellRole.empty,
-  });
-
-  final int x;
-  final int y;
-  final GridCellRole role;
-
-  static const double _labelFontSize = 10;
-  static const double _borderWidth = 1;
-  static const double _radius = 4;
-
-  Color get _background => switch (role) {
+/// Role colors shared by the widget cell ([GridCell]) and the large-board
+/// painter (`GridCellPainter` in `path_grid.dart`).
+extension GridCellRoleStyle on GridCellRole {
+  /// Fill color of the cell.
+  Color get fill => switch (this) {
     GridCellRole.empty => AppColors.emptyCell,
     GridCellRole.locked => AppColors.lockedCell,
     GridCellRole.path => AppColors.pathCell,
@@ -49,19 +33,57 @@ class GridCell extends StatelessWidget {
     GridCellRole.end => AppColors.terminalCell,
   };
 
-  Color get _labelColor => switch (role) {
+  /// Coordinate caption color.
+  Color get labelColor => switch (this) {
     GridCellRole.empty => AppColors.lockedCell,
     GridCellRole.locked ||
     GridCellRole.path ||
     GridCellRole.start ||
     GridCellRole.end => AppColors.buttonTextColor,
   };
+}
+
+/// One square cell of the preview grid with its `(x,y)` coordinates inside.
+///
+/// Small fields show the `(x,y)` caption; large ones skip the text entirely
+/// because they are drawn by `GridCellPainter` (see `path_grid.dart`).
+class GridCell extends StatelessWidget {
+  const GridCell({
+    super.key,
+    required this.x,
+    required this.y,
+    this.role = GridCellRole.empty,
+    this.hideLabel = false,
+  });
+
+  final int x;
+  final int y;
+  final GridCellRole role;
+  final bool hideLabel;
+
+  static const double _labelFontSize = 10;
+  static const double _borderWidth = 1;
+  static const double _radius = 4;
 
   @override
   Widget build(BuildContext context) {
+    // Fast path for big boards: plain color + border radius via DecoratedBox,
+    // but no per-cell text layout at all.
+    if (hideLabel) {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: role.fill,
+          border: Border.all(
+            color: AppColors.lockedCell,
+            width: _borderWidth.w,
+          ),
+          borderRadius: BorderRadius.circular(_radius.r),
+        ),
+      );
+    }
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: _background,
+        color: role.fill,
         border: Border.all(color: AppColors.lockedCell, width: _borderWidth.w),
         borderRadius: BorderRadius.circular(_radius.r),
       ),
@@ -75,7 +97,7 @@ class GridCell extends StatelessWidget {
               maxLines: 1,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: _labelColor,
+                color: role.labelColor,
                 fontSize: _labelFontSize.sp,
                 fontWeight: FontWeight.w600,
               ),

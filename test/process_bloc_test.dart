@@ -107,6 +107,25 @@ void main() {
     await bloc.close();
   });
 
+  test(
+    'task lists larger than one chunk are solved across isolate spawns',
+    () async {
+      // >16 tasks forces multiple compute chunks; the bloc must still merge
+      // every batch into one ready state with all results present.
+      final tasks = [for (var i = 0; i < 40; i++) _task('t$i')];
+      final path = FakePathRepository(tasks: tasks);
+      final bloc = ProcessBloc(FakeUrlRepository(url: _validUrl), path)
+        ..add(const ProcessEvent.started());
+
+      final ready = await bloc.stream.firstWhere((s) => s.isReady);
+      expect(ready.total, 40);
+      expect(ready.solved, 40);
+      expect(ready.progress, 100);
+      expect(ready.results, hasLength(40));
+      await bloc.close();
+    },
+  );
+
   test('progress percent reflects solved over total', () async {
     final path = FakePathRepository(tasks: [_task('a'), _task('b')]);
     final bloc = ProcessBloc(FakeUrlRepository(url: _validUrl), path);

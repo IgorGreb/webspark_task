@@ -48,8 +48,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i646.IUrlRepository>(
       () => _i94.UrlRepository(gh<_i460.SharedPreferences>()),
     );
-    gh.lazySingleton<_i374.IPathRepository>(
+    gh.factory<_i285.PathRepository>(
       () => _i285.PathRepository(gh<_i519.Client>()),
+    );
+    gh.lazySingleton<_i374.IPathRepository>(
+      () => networkModule.pathRepository(gh<_i285.PathRepository>()),
     );
     gh.factory<_i160.HomeBloc>(
       () => _i160.HomeBloc(

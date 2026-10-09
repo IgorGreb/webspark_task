@@ -49,9 +49,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     HomeSubmitted event,
     Emitter<HomeState> emit,
   ) async {
+    // Guard against double-tap / keyboard+button double submit.
+    if (state.status == HomeStatus.submitting) return;
     final url = state.url.trim();
 
     if (!UrlValidator.isValid(url)) {
+      emit(
+        state.copyWith(
+          isValid: false,
+          failure: SomeFailure.invalidUrl,
+          status: HomeStatus.failure,
+        ),
+      );
+      return;
+    }
+
+    // SSRF guard: well-formed but non-public targets never hit the network.
+    if (!UrlValidator.isSafeForRequest(url)) {
       emit(
         state.copyWith(
           isValid: false,

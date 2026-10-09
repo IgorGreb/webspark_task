@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:webspark_task/core/validators/url_validator.dart';
 import 'package:webspark_task/features/solver/queen_solver.dart';
 import 'package:webspark_task/shared/models/failure_model/some_failure.dart';
 import 'package:webspark_task/shared/models/solved_model.dart';
@@ -30,48 +31,86 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
     ProcessStarted event,
     Emitter<ProcessState> emit,
   ) async {
-    // Guard against double-tap on Try Again while a fetch/compute is running.
     if (state.isFetching || state.isCalculating) return;
     emit(const ProcessState(isFetching: true));
 
-    // Tasks preloaded by Home (passed via `extra`) skip the second fetch,
-    // so the server is hit only once. Direct entry / retry fetches as before.
     final preloaded = event.tasks;
     List<TaskModel>? tasks = preloaded;
     if (tasks == null) {
       final savedUrl = _urlRepository.getUrl().fold((_) => null, (url) => url);
-      if (savedUrl == null || savedUrl.isEmpty) {
-        emit(const ProcessState(failure: SomeFailure.invalidUrl));
+      if (savedUrl == null ||
+          savedUrl.isEmpty ||
+          !UrlValidator.isValid(savedUrl)) {
+        if (!emit.isDone) {
+          emit(const ProcessState(failure: SomeFailure.invalidUrl));
+        }
         return;
       }
 
       final tasksResult = await _pathRepository.fetchTasks(savedUrl);
+      if (emit.isDone) return;
 
       tasks = tasksResult.fold((_) => null, (tasks) => tasks);
       if (tasks == null) {
-        emit(ProcessState(failure: _failureOf(tasksResult)));
+        if (!emit.isDone) {
+          emit(ProcessState(failure: _failureOf(tasksResult)));
+        }
         return;
       }
     }
 
+    if (emit.isDone) return;
     emit(ProcessState(total: tasks.length, isCalculating: true));
 
     final results = <SolvedModel>[];
     var solved = 0;
-    for (final task in tasks) {
-      final solvedTask = await compute(_solveTaskIsolate, task);
-      if (solvedTask != null) results.add(solvedTask);
-      solved += 1;
+    // Throttle progress emits: rebuilding the progress UI per task is wasteful
+    // when hundreds of small fields solve in milliseconds.
+    var lastEmit = DateTime.fromMillisecondsSinceEpoch(0);
+    var lastProgress = 0;
+    const throttle = Duration(milliseconds: 120);
+    // One isolate spawn per chunk instead of per task: spawning an isolate
+    // for every tiny 2x2 field costs ~100x the solve itself and floods the
+    // main isolate with spawn/copy work (visible as frame spikes in DevTools).
+    const chunkSize = 16;
+    for (var start = 0; start < tasks.length; start += chunkSize) {
+      // Screen gone (back navigation) -> stop burning CPU + never emit
+      // into a closed bloc.
+      if (emit.isDone) return;
+      final end = start + chunkSize < tasks.length
+          ? start + chunkSize
+          : tasks.length;
+      final solvedChunk = await compute(
+        _solveTasksIsolate,
+        tasks.sublist(start, end),
+      );
+      if (emit.isDone) return;
+      results.addAll(solvedChunk);
+      solved += end - start;
+      final now = DateTime.now();
+      final isLast = end >= tasks.length;
+      final progress = (solved * 100 / tasks.length).round();
+      // Skip states nobody renders: same percent (the UI's buildWhen would
+      // reject them anyway) or inside the throttle window. `results` catch
+      // up in the final emit below.
+      if (!isLast &&
+          (progress == lastProgress ||
+              now.difference(lastEmit) < throttle)) {
+        continue;
+      }
+      lastEmit = now;
+      lastProgress = progress;
       emit(
         ProcessState(
           total: tasks.length,
           solved: solved,
-          isCalculating: true,
+          isCalculating: !isLast,
           results: List.unmodifiable(results),
         ),
       );
     }
 
+    if (emit.isDone) return;
     emit(
       ProcessState(
         total: tasks.length,
@@ -117,10 +156,18 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
       result.fold((failure) => failure, (_) => SomeFailure.unknown);
 }
 
-SolvedModel? _solveTaskIsolate(TaskModel task) {
-  try {
-    return solveTask(task);
-  } on ArgumentError {
-    return null;
+/// Runs in a background isolate via [compute]: solves a batch of tasks,
+/// skipping malformed fields ([ArgumentError]) and unsolvable ones (null) —
+/// exactly the behavior of the previous per-task entry point.
+List<SolvedModel> _solveTasksIsolate(List<TaskModel> tasks) {
+  final solved = <SolvedModel>[];
+  for (final task in tasks) {
+    try {
+      final result = solveTask(task);
+      if (result != null) solved.add(result);
+    } on ArgumentError {
+      // Malformed field: counts toward progress, not toward results.
+    }
   }
+  return solved;
 }

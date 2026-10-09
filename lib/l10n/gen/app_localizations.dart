@@ -261,6 +261,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Please try again.'**
   String get unknownFailure;
+
+  /// Warning shown when the API base URL uses plain http
+  ///
+  /// In en, this message translates to:
+  /// **'Unencrypted http:// connection — results are sent in cleartext.'**
+  String get insecureHttpWarning;
 }
 
 class _AppLocalizationsDelegate

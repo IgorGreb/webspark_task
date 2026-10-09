@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:webspark_task/components/preview/bloc/preview_bloc.dart';
 import 'package:webspark_task/shared/constants/constants.dart';
-import 'package:webspark_task/shared/constants/theme/app_colors.dart';
 import 'package:webspark_task/shared/models/solved_model.dart';
 import 'package:webspark_task/shared/navigation/app_router.dart';
 
@@ -13,29 +13,23 @@ class ResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pathStr = solved.steps.map((p) => '(${p.x},${p.y})').join('->');
+    // Cheap memoized preview text: no per-build join of a 10k-step path.
+    final pathStr = PreviewState.buildPathLabel(solved.steps);
 
     return InkWell(
       onTap: () => context.pushNamed(KRoute.preview.name, extra: solved),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
-            child: Text(
-              pathStr,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: AppSizes.bodyFontSize.sp,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+        child: Text(
+          pathStr,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: AppSizes.bodyFontSize.sp,
+            fontWeight: FontWeight.w600,
           ),
-          const Divider(height: 1, thickness: 1, color: AppColors.dividerColor),
-        ],
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
   }

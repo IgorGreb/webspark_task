@@ -30,6 +30,9 @@ class HomeView extends StatelessWidget {
             buildWhen: (previous, current) => previous.status != current.status,
             builder: (context, state) {
               final isSubmitting = state.status == HomeStatus.submitting;
+              // Always tappable (except while submitting): tapping with an
+              // empty/invalid URL shows the inline error instead of a dead
+              // grey button with no feedback.
               return MainBtn(
                 onPressed: isSubmitting
                     ? null
