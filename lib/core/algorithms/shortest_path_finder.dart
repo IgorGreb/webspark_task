@@ -44,14 +44,15 @@ class Grid {
   bool isFree(Point point) => isInside(point) && _rows[point.y][point.x] != 'X';
 }
 
-abstract class QueenStrategy {
-  const QueenStrategy();
+
+abstract class MovementStrategy {
+  const MovementStrategy();
 
   Iterable<Point> nextPoints(Grid grid, Point from);
 }
 
-class QueenSlideStrategy implements QueenStrategy {
-  const QueenSlideStrategy();
+class SlidingMovement implements MovementStrategy {
+  const SlidingMovement();
 
   static const List<(int, int)> _directions = <(int, int)>[
     (-1, -1),
@@ -78,12 +79,13 @@ class QueenSlideStrategy implements QueenStrategy {
   }
 }
 
-class BfsSolver {
-  const BfsSolver(this.strategy);
 
-  final QueenStrategy strategy;
+class ShortestPathFinder {
+  const ShortestPathFinder(this.strategy);
 
-  List<Point>? solve(Grid grid, Point start, Point end) {
+  final MovementStrategy strategy;
+
+  List<Point>? find(Grid grid, Point start, Point end) {
     if (!grid.isFree(start) || !grid.isFree(end)) return null;
     if (start == end) return <Point>[start];
 
@@ -137,10 +139,10 @@ List<Point> expandFullPath(List<Point> turns) {
   return full;
 }
 
-SolvedModel? solveTask(TaskModel task) {
+SolvedModel? findShortestPath(TaskModel task) {
   final grid = Grid(task.field);
-  const solver = BfsSolver(QueenSlideStrategy());
-  final path = solver.solve(
+  const finder = ShortestPathFinder(SlidingMovement());
+  final path = finder.find(
     grid,
     Point(task.start.x, task.start.y),
     Point(task.end.x, task.end.y),

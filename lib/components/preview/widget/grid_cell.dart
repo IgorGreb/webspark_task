@@ -8,16 +8,16 @@ enum GridCellRole {
   /// Free cell that the path does not use.
   empty,
 
-  /// Cell holding `X`, unreachable for the queen.
+  /// Cell holding `X`, unreachable for the path.
   locked,
 
   /// Intermediate stop of the shortest path.
   path,
 
-  /// Where the queen starts.
+  /// Where the path starts.
   start,
 
-  /// Where the queen has to arrive.
+  /// Where the path has to arrive.
   end,
 }
 

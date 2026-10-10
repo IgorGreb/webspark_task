@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:webspark_task/core/validators/url_validator.dart';
-import 'package:webspark_task/features/solver/queen_solver.dart';
+import 'package:webspark_task/core/algorithms/shortest_path_finder.dart';
 import 'package:webspark_task/shared/models/failure_model/some_failure.dart';
 import 'package:webspark_task/shared/models/solved_model.dart';
 import 'package:webspark_task/shared/models/submit_model.dart';
@@ -81,7 +81,7 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
           ? start + chunkSize
           : tasks.length;
       final solvedChunk = await compute(
-        _solveTasksIsolate,
+        _findShortestPathsIsolate,
         tasks.sublist(start, end),
       );
       if (emit.isDone) return;
@@ -90,9 +90,6 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
       final now = DateTime.now();
       final isLast = end >= tasks.length;
       final progress = (solved * 100 / tasks.length).round();
-      // Skip states nobody renders: same percent (the UI's buildWhen would
-      // reject them anyway) or inside the throttle window. `results` catch
-      // up in the final emit below.
       if (!isLast &&
           (progress == lastProgress ||
               now.difference(lastEmit) < throttle)) {
@@ -156,14 +153,12 @@ class ProcessBloc extends Bloc<ProcessEvent, ProcessState> {
       result.fold((failure) => failure, (_) => SomeFailure.unknown);
 }
 
-/// Runs in a background isolate via [compute]: solves a batch of tasks,
-/// skipping malformed fields ([ArgumentError]) and unsolvable ones (null) —
-/// exactly the behavior of the previous per-task entry point.
-List<SolvedModel> _solveTasksIsolate(List<TaskModel> tasks) {
+
+List<SolvedModel> _findShortestPathsIsolate(List<TaskModel> tasks) {
   final solved = <SolvedModel>[];
   for (final task in tasks) {
     try {
-      final result = solveTask(task);
+      final result = findShortestPath(task);
       if (result != null) solved.add(result);
     } on ArgumentError {
       // Malformed field: counts toward progress, not toward results.
